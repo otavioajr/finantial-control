@@ -1,0 +1,369 @@
+:root {
+    --primary-color: #2563eb;
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+    --background-color: #f1f5f9;
+    --card-background: #ffffff;
+    --text-color: #1e293b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.nav-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var(--card-background);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+}
+
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+.btn-salvar {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-salvar:hover {
+    background-color: #1d4ed8;
+}
+
+.receitas .btn-salvar {
+    background-color: var(--success-color);
+}
+
+.receitas .btn-salvar:hover {
+    background-color: #15803d;
+}
+
+.despesas .btn-salvar {
+    background-color: var(--danger-color);
+}
+
+.despesas .btn-salvar:hover {
+    background-color: #b91c1c;
+}
+
+.hidden {
+    display: none;
+}
+
+.dia-salario-único,
+#config-adiantamento {
+    transition: opacity 0.3s ease;
+}
+
+.dia-salario-único.hidden,
+#config-adiantamento.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.relatorio-container {
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mes-selector {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.mes-selector select {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+}
+
+#mes-select {
+    width: 200px;
+}
+
+#ano-select {
+    width: 120px;
+}
+
+.tabela-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* Estilos para configuração salarial */
+.config-salarial {
+    margin-bottom: 2rem;
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: auto;
+    cursor: pointer;
+}
+
+#config-adiantamento {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+#config-adiantamento .input-group {
+    position: relative;
+}
+
+.porcentagem-simbolo {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(25%);
+    color: #64748b;
+}
+
+#config-adiantamento input[type="number"] {
+    width: 100%;
+}
+
+/* Estilos para botão flutuante e painel de configuração */
+.floating-button {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.floating-button:hover {
+    transform: scale(1.1);
+    background-color: #1d4ed8;
+}
+
+.dollar-sign {
+    line-height: 1;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+}
+
+.config-panel {
+    position: fixed;
+    left: -400px;
+    bottom: 90px;
+    width: 350px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.config-panel.active {
+    left: 20px;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ajuste para o card dentro do painel */
+.config-panel .config-salarial {
+    margin-bottom: 0;
+}
+
+/* Adicionar backdrop quando painel estiver aberto */
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 999;
+}
+
+.backdrop.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ajustes para o scroll do painel */
+.config-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.config-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.config-panel::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.config-panel::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Adicione estes estilos para a tabela */
+#tabela-financeira td:first-child {
+    cursor: help;
+}
+
+#tabela-financeira td[title] {
+    position: relative;
+}
+
+#tabela-financeira td[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 0;
+    /* Use bottom: 100% para que o tooltip apareça acima na última linha */
+    bottom: 100%;
+    background-color: rgba(30, 41, 59, 0.9);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    z-index: 1000;
+    white-space: pre-line;
+    text-align: left;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    margin-bottom: 4px;
+    overflow: visible;
+}
+
+/* Nova classe para dias não úteis */
+.non-business td {
+    color: #b0b0b0;
+    font-style: italic;
+}
