@@ -84,26 +84,33 @@ async function loadUserData() {
   }
   
   try {
-    console.log('Carregando dados para usuário:', currentUser.uid);
-    const data = await getUserData(currentUser.uid);
-    
-    if (!data) {
-      console.log('Nenhum dado encontrado para o usuário');
-      return;
-    }
+    return getUserData(currentUser.uid).then(data => {
+      if (!data) {
+        console.log('Nenhum dado encontrado para o usuário');
+        return;
+      }
 
-    currentUser.isAdmin = data.isAdmin;
-    console.log('Dados carregados com sucesso');
-    
-    // Usar setTimeout para evitar o erro do message channel
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('userDataLoaded', { 
-        detail: data,
-        bubbles: true 
-      }));
-    }, 0);
+      currentUser.isAdmin = data.isAdmin;
+      
+      // Importar dinamicamente e carregar as transações
+      import('./finance.js').then(({ carregarTransacoes, configSalarial }) => {
+        // Carregar transações
+        carregarTransacoes(data);
+        
+        // Atualizar configuração salarial
+        if (data.configSalarial) {
+          Object.assign(configSalarial, data.configSalarial);
+        }
+        
+        // Disparar evento de dados carregados
+        window.dispatchEvent(new CustomEvent('userDataLoaded', { 
+          detail: data,
+          bubbles: true 
+        }));
+      });
 
-    return data;
+      return data;
+    });
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
   }

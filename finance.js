@@ -24,7 +24,7 @@ export const historicoSalarial = [{
 export let inicioMes = new Date().getMonth() + 1;
 export let inicioAno = new Date().getFullYear();
 
-export function adicionarReceita(valor, data, descricao) {
+export async function adicionarReceita(valor, data, descricao) {
   const [ano, mes, dia] = data.split("-");
   const dataAjustada = new Date(ano, mes - 1, dia);
   const receita = {
@@ -36,13 +36,15 @@ export function adicionarReceita(valor, data, descricao) {
     receita.tipo = "salario";
   }
   transacoes.receitas.push(receita);
+  
+  // Salvar no Firebase
+  await salvarTransacoes();
 }
 
-export function adicionarDespesa(valor, data, descricao, isFixa, isDiaria, numParcelas = 1) {
+export async function adicionarDespesa(valor, data, descricao, isFixa, isDiaria, numParcelas = 1) {
   const [ano, mes, dia] = data.split("-");
   const dataAjustada = new Date(ano, mes - 1, dia);
   
-  // Se for despesa parcelada, cria múltiplas entradas
   if (isFixa && numParcelas > 1) {
     const valorParcela = parseFloat(valor) / numParcelas;
     
@@ -73,6 +75,42 @@ export function adicionarDespesa(valor, data, descricao, isFixa, isDiaria, numPa
       totalParcelas: 1
     });
   }
+  
+  // Salvar no Firebase
+  await salvarTransacoes();
+}
+
+export async function salvarTransacoes() {
+  const { saveUserData } = await import('./auth.js');
+  
+  // Converte as datas para timestamps antes de salvar
+  const transacoesParaSalvar = {
+    receitas: transacoes.receitas.map(r => ({
+      ...r,
+      data: r.data.getTime() // converte Date para timestamp
+    })),
+    despesas: transacoes.despesas.map(d => ({
+      ...d,
+      data: d.data.getTime() // converte Date para timestamp
+    }))
+  };
+  
+  await saveUserData({ transacoes: transacoesParaSalvar });
+}
+
+export function carregarTransacoes(dadosCarregados) {
+  if (!dadosCarregados?.transacoes) return;
+  
+  // Converte timestamps de volta para objetos Date
+  transacoes.receitas = dadosCarregados.transacoes.receitas.map(r => ({
+    ...r,
+    data: new Date(r.data)
+  }));
+  
+  transacoes.despesas = dadosCarregados.transacoes.despesas.map(d => ({
+    ...d,
+    data: new Date(d.data)
+  }));
 }
 
 export function getSalaryValue(dia, mes, ano) {

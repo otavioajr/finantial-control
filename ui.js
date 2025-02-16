@@ -19,20 +19,25 @@ export function initApp() {
 
 export function setupEventListeners() {
   // Evento do formulário de receita
-  document.getElementById("form-receita").addEventListener("submit", (e) => {
+  document.getElementById("form-receita").addEventListener("submit", async (e) => {
     e.preventDefault();
     const valor = e.target.querySelector("#valor-receita").value;
     const data = e.target.querySelector("#data-receita").value;
     const descricao = e.target.querySelector("#desc-receita").value;
-    adicionarReceita(valor, data, descricao);
-    e.target.reset();
-    setDataAtual();
-    alert("Receita adicionada com sucesso!");
-    gerarLinhasTabela(parseInt(document.querySelector('.mes-card.active').dataset.mes));
+    
+    try {
+      await adicionarReceita(valor, data, descricao);
+      e.target.reset();
+      setDataAtual();
+      alert("Receita adicionada com sucesso!");
+      gerarLinhasTabela(parseInt(document.querySelector('.mes-card.active').dataset.mes));
+    } catch (error) {
+      alert("Erro ao adicionar receita: " + error.message);
+    }
   });
 
   // Evento do formulário de despesa
-  document.getElementById("form-despesa").addEventListener("submit", (e) => {
+  document.getElementById("form-despesa").addEventListener("submit", async (e) => {
     e.preventDefault();
     const isFixa = document.getElementById("despesa-fixa").checked;
     const isDiaria = document.getElementById("despesa-diaria").checked;
@@ -41,13 +46,17 @@ export function setupEventListeners() {
     const descricao = e.target.querySelector("#desc-despesa").value;
     const numParcelas = isFixa ? parseInt(document.getElementById("num-parcelas").value) : 1;
 
-    adicionarDespesa(valor, data, descricao, isFixa, isDiaria, numParcelas);
-    e.target.reset();
-    document.getElementById("despesa-diaria").checked = true;
-    document.getElementById("parcelas-container").style.display = "none";
-    setDataAtual();
-    alert("Despesa adicionada com sucesso!");
-    gerarLinhasTabela(parseInt(document.querySelector('.mes-card.active').dataset.mes));
+    try {
+      await adicionarDespesa(valor, data, descricao, isFixa, isDiaria, numParcelas);
+      e.target.reset();
+      document.getElementById("despesa-diaria").checked = true;
+      document.getElementById("parcelas-container").style.display = "none";
+      setDataAtual();
+      alert("Despesa adicionada com sucesso!");
+      gerarLinhasTabela(parseInt(document.querySelector('.mes-card.active').dataset.mes));
+    } catch (error) {
+      alert("Erro ao adicionar despesa: " + error.message);
+    }
   });
 
   // Adicionar evento para mostrar/esconder campo de parcelas
