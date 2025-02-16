@@ -70,15 +70,8 @@ async function setupAdminUser() {
 // Modificar a função de login para usar email diretamente
 export async function loginUser(email, password) {
   try {
-    // Se for admin, ainda executa setup se necessário
-    if (email === ADMIN_EMAIL) {
-      await setupAdminUser();
-    }
-    
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-    const userData = userDoc.data();
-    userCredential.user.isAdmin = userData?.isAdmin || false;
+    // Removido o setup de admin aqui para tornar o login mais rápido
     return userCredential.user;
   } catch (error) {
     throw new Error(getErrorMessage(error.code));
@@ -88,10 +81,22 @@ export async function loginUser(email, password) {
 export async function registerUser(email, password) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    // Criar documento inicial do usuário
+    
+    // Criar documento inicial do usuário com todos os campos necessários
     await setDoc(doc(db, 'users', userCredential.user.uid), {
       email,
-      configSalarial: {},
+      isAdmin: false,
+      configSalarial: {
+        salarioBase: 0,
+        temAdiantamento: false,
+        porcentagemAdiantamento: 40,
+        diaAdiantamento: 15,
+        diaPagamento: 30,
+        diaSalario: 5,
+        querInvestir: false,
+        investPorcentagem: 0,
+        investManual: 0
+      },
       transacoes: {
         receitas: [],
         despesas: []
@@ -99,6 +104,7 @@ export async function registerUser(email, password) {
       inicioMes: new Date().getMonth() + 1,
       inicioAno: new Date().getFullYear()
     });
+    
     return userCredential.user;
   } catch (error) {
     throw new Error(getErrorMessage(error.code));
@@ -120,18 +126,65 @@ export function onAuthChange(callback) {
 // Modificar a função getUserData para incluir informação de admin
 export async function getUserData(userId) {
   try {
-    const docRef = doc(db, 'users', userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      return {
-        ...data,
-        isAdmin: data.email === ADMIN_EMAIL
-      };
+    if (!userId) {
+      console.error('ID do usuário não fornecido');
+      return null;
     }
-    throw new Error('Usuário não encontrado');
+
+    if (!auth.currentUser) {
+      console.error('Usuário não está autenticado');
+      return null;
+    }
+
+    console.log('Tentando acessar documento:', userId);
+    const docRef = doc(db, 'users', userId);
+    
+    try {
+      const docSnap = await getDoc(docRef);
+      
+      if (!docSnap.exists()) {
+        console.log('Documento não existe, criando novo...');
+        const defaultData = {
+          email: auth.currentUser.email,
+          isAdmin: false,
+          configSalarial: {
+            salarioBase: 0,
+            temAdiantamento: false,
+            porcentagemAdiantamento: 40,
+            diaAdiantamento: 15,
+            diaPagamento: 30,
+            diaSalario: 5,
+            querInvestir: false,
+            investPorcentagem: 0,
+            investManual: 0
+          },
+          transacoes: {
+            receitas: [],
+            despesas: []
+          },
+          inicioMes: new Date().getMonth() + 1,
+          inicioAno: new Date().getFullYear()
+        };
+
+        // Tenta criar o documento
+        try {
+          await setDoc(docRef, defaultData);
+          console.log('Documento criado com sucesso');
+          return defaultData;
+        } catch (setError) {
+          console.error('Erro ao criar documento:', setError);
+          throw new Error('Erro ao criar perfil do usuário');
+        }
+      }
+
+      return docSnap.data();
+    } catch (getError) {
+      console.error('Erro ao acessar documento:', getError);
+      throw new Error('Erro ao acessar dados do usuário');
+    }
   } catch (error) {
-    throw new Error('Erro ao buscar dados do usuário');
+    console.error('Erro detalhado:', error);
+    throw error;
   }
 }
 

@@ -10,20 +10,31 @@ import {
 let currentUser = null;
 
 export function initAuth() {
-  // Mostra a tela de login por padrão antes de verificar autenticação
-  showLogin();
-  
   return new Promise((resolve) => {
-    onAuthChange((user) => {
+    const unsubscribe = onAuthChange((user) => {
       currentUser = user;
-      console.log('Estado de autenticação alterado:', user);
+      console.log('Estado de autenticação:', user ? 'Autenticado' : 'Não autenticado');
+      
       if (user) {
         showApp();
-        loadUserData().then(() => resolve(user));
+        // Carrega os dados em segundo plano
+        loadUserData()
+          .then(() => {
+            resolve(user);
+          })
+          .catch((error) => {
+            console.error('Erro ao carregar dados:', error);
+            resolve(user);
+          });
       } else {
         showLogin();
         resolve(null);
       }
+    });
+
+    // Adicionar cleanup para evitar memory leaks
+    window.addEventListener('unload', () => {
+      unsubscribe();
     });
   });
 }
@@ -67,22 +78,58 @@ export function isCurrentUserAdmin() {
 }
 
 async function loadUserData() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    console.log('Nenhum usuário autenticado');
+    return;
+  }
+  
   try {
+    console.log('Carregando dados para usuário:', currentUser.uid);
     const data = await getUserData(currentUser.uid);
+    
+    if (!data) {
+      console.log('Nenhum dado encontrado para o usuário');
+      return;
+    }
+
     currentUser.isAdmin = data.isAdmin;
-    window.dispatchEvent(new CustomEvent('userDataLoaded', { detail: data }));
+    console.log('Dados carregados com sucesso');
+    
+    // Usar setTimeout para evitar o erro do message channel
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('userDataLoaded', { 
+        detail: data,
+        bubbles: true 
+      }));
+    }, 0);
+
+    return data;
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
   }
 }
 
 function showApp() {
-  document.getElementById('login-page').classList.add('hidden');
+  console.log('Usuário logado, exibindo app');
+  document.getElementById('login-page').classList.add('hidden'); // Corrigido: deve ser add, não remove
   document.getElementById('app-container').classList.remove('hidden');
 }
 
 function showLogin() {
-  document.getElementById('app-container').classList.add('hidden');
   document.getElementById('login-page').classList.remove('hidden');
+  document.getElementById('app-container').classList.add('hidden');
+  
+  // Garantir que os formulários de autenticação estejam visíveis
+  const loginForm = document.getElementById('login-form');
+  const registerForm = document.getElementById('register-form');
+  
+  // Mostrar o formulário de login por padrão
+  if (loginForm) {
+    loginForm.classList.add('active');
+    document.querySelector('.auth-tab[data-tab="login"]')?.classList.add('active');
+  }
+  if (registerForm) {
+    registerForm.classList.remove('active');
+    document.querySelector('.auth-tab[data-tab="register"]')?.classList.remove('active');
+  }
 }

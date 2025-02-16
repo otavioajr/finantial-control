@@ -1,29 +1,52 @@
 // script.js
 import { initApp, setupEventListeners } from './ui.js';
-import { initAuth, login, register } from './auth.js';
+import { initAuth, login, register, logout } from './auth.js';
 
-document.addEventListener("DOMContentLoaded", async () => {
-  // Espera a inicialização da autenticação antes de continuar
-  await initAuth();
-  initApp();
-  setupEventListeners();
-  setupAuthListeners();
+document.addEventListener("DOMContentLoaded", () => {
+  // Inicializar autenticação e aguardar resultado
+  initAuth().then((user) => {
+    console.log('Inicialização completa, usuário:', user?.email || 'nenhum');
+    if (user) {
+      initApp();
+      setupEventListeners();
+    }
+    setupAuthListeners();
+  }).catch(error => {
+    console.error('Erro na inicialização:', error);
+    showLogin();
+  });
 });
 
 function setupAuthListeners() {
   // Toggle entre login e registro
   document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => {
+      // Remove active de todas as abas
       document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+      // Adiciona active na aba clicada
       tab.classList.add('active');
       
-      // Oculta os formulários existentes
-      document.querySelectorAll('.auth-form').forEach(form => form.classList.add('hidden'));
+      // Remove active de todos os formulários
+      document.querySelectorAll('.auth-form').forEach(form => {
+        form.classList.remove('active');
+        form.classList.remove('hidden'); // Remove hidden de todos os formulários
+      });
       
+      // Mostra o formulário correspondente
       const formId = `${tab.dataset.tab}-form`;
-      document.getElementById(formId).classList.remove('hidden');
+      const form = document.getElementById(formId);
+      if (form) {
+        form.classList.add('active');
+        form.classList.remove('hidden');
+      }
     });
   });
+
+  // Ativar formulário de login por padrão
+  const loginTab = document.querySelector('.auth-tab[data-tab="login"]');
+  if (loginTab) {
+    loginTab.click();
+  }
 
   // Formulário de login
   document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -70,6 +93,17 @@ function setupAuthListeners() {
       document.getElementById('login-email').value = email;
     } catch (error) {
       alert(error.message);
+    }
+  });
+
+  // Adicionar evento para o botão de logout
+  document.getElementById('btn-logout').addEventListener('click', async () => {
+    try {
+      await logout();
+      console.log('Logout efetuado com sucesso');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      alert('Erro ao fazer logout');
     }
   });
 }
