@@ -1,19 +1,62 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle Financeiro</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle Financeiro</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div id="login-page">
+        <div class="login-container">
+            <h1>Controle Financeiro</h1>
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="register">Registro</button>
+            </div>
+            
+            <form id="login-form" class="auth-form">
+                <div class="input-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="login-password">Senha</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" class="btn-primary">Entrar</button>
+            </form>
+
+            <form id="register-form" class="auth-form hidden">
+                <div class="input-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-password">Senha</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="input-group">
+                    <label for="register-password-confirm">Confirmar Senha</label>
+                    <input type="password" id="register-password-confirm" required>
+                </div>
+                <button type="submit" class="btn-primary">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+  <div class="container">
         <header>
             <h1>Controle Financeiro</h1>
             <nav>
                 <button class="nav-btn active" id="btn-main">Principal</button>
                 <button class="nav-btn" id="btn-relatorio">Relatório Mensal</button>
+                <button class="nav-btn" id="btn-salvar-historico" title="Salvar Histórico">💾</button>
+                <button class="nav-btn" id="inicio-calc-btn" title="Configurar Início dos Cálculos">
+                    ⚙
+                </button>
             </nav>
         </header>
 
@@ -60,38 +103,41 @@
                             <label for="desc-despesa">Descrição</label>
                             <input type="text" id="desc-despesa" placeholder="Descrição da despesa">
                         </div>
+
+                        <div class="input-group checkbox-container">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="radio" id="despesa-fixa" name="tipo-despesa" value="fixa">
+                                    Despesa Fixa
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="radio" id="despesa-diaria" name="tipo-despesa" value="diaria" checked>
+                                    Despesa Diária
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Novo campo para parcelas -->
+                        <div class="input-group" id="parcelas-container" style="display: none;">
+                            <label for="num-parcelas">Número de Parcelas</label>
+                            <input type="number" id="num-parcelas" min="1" max="48" value="1" placeholder="Ex: 12">
+                            <small class="helper-text">Máximo de 48 parcelas</small>
+                        </div>
                         
                         <button type="submit" class="btn-salvar">Adicionar Despesa</button>
                     </form>
                 </div>
 
-                <!-- Novo Card para definir início dos cálculos -->
-                <div class="card inicio-calc">
-                    <h2>Início dos Cálculos</h2>
-                    <form id="form-inicio">
-                        <div class="input-group">
-                            <label for="inicio-mes">Mês Inicial</label>
-                            <select id="inicio-mes">
-                                <option value="1">Janeiro</option>
-                                <option value="2">Fevereiro</option>
-                                <option value="3">Março</option>
-                                <option value="4">Abril</option>
-                                <option value="5">Maio</option>
-                                <option value="6">Junho</option>
-                                <option value="7">Julho</option>
-                                <option value="8">Agosto</option>
-                                <option value="9">Setembro</option>
-                                <option value="10">Outubro</option>
-                                <option value="11">Novembro</option>
-                                <option value="12">Dezembro</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="inicio-ano">Ano Inicial</label>
-                            <input type="number" id="inicio-ano" min="2000" placeholder="2023" required>
-                        </div>
-                        <button type="submit" class="btn-salvar">Salvar Início</button>
-                    </form>
+                <!-- Adicionar um novo card separado para Múltiplas Despesas -->
+                <div class="card multiple-expenses" id="card-multiple-expenses">
+                    <h2>Adicionar Múltiplas Despesas</h2>
+                    <div class="expenses-list" id="expenses-list">
+                        <!-- Despesas serão adicionadas aqui dinamicamente -->
+                    </div>
+                    <button type="button" class="btn-add-expense">+ Adicionar Despesa</button>
+                    <button type="button" class="btn-salvar" id="btn-save-multiple">Salvar Todas</button>
                 </div>
             </div>
         </main>
@@ -99,21 +145,21 @@
         <div id="relatorio-page" class="hidden">
             <div class="relatorio-container">
                 <div class="mes-selector">
-                    <select id="mes-select">
-                        <option value="1">Janeiro</option>
-                        <option value="2">Fevereiro</option>
-                        <option value="3">Março</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Maio</option>
-                        <option value="6">Junho</option>
-                        <option value="7">Julho</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Setembro</option>
-                        <option value="10">Outubro</option>
-                        <option value="11">Novembro</option>
-                        <option value="12">Dezembro</option>
-                    </select>
                     <select id="ano-select"></select>
+                </div>
+                <div class="meses-grid">
+                    <div class="mes-card" data-mes="1">Janeiro</div>
+                    <div class="mes-card" data-mes="2">Fevereiro</div>
+                    <div class="mes-card" data-mes="3">Março</div>
+                    <div class="mes-card" data-mes="4">Abril</div>
+                    <div class="mes-card" data-mes="5">Maio</div>
+                    <div class="mes-card" data-mes="6">Junho</div>
+                    <div class="mes-card" data-mes="7">Julho</div>
+                    <div class="mes-card" data-mes="8">Agosto</div>
+                    <div class="mes-card" data-mes="9">Setembro</div>
+                    <div class="mes-card" data-mes="10">Outubro</div>
+                    <div class="mes-card" data-mes="11">Novembro</div>
+                    <div class="mes-card" data-mes="12">Dezembro</div>
                 </div>
                 <div class="tabela-container">
                     <table id="tabela-financeira">
@@ -132,6 +178,60 @@
                     </table>
                 </div>
             </div>
+        </div>
+
+        <div id="historico-page" class="hidden">
+            <div class="relatorio-container">
+                <h2>Histórico de Transações</h2>
+                <div class="tabela-container">
+                    <table id="tabela-historico">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historico-body">
+                            <!-- Linhas serão geradas via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popup do painel de configuração do Início dos Cálculos -->
+    <div id="inicio-calc-panel" class="config-panel">
+        <div class="card config-salarial">
+            <h2>Configurar Início dos Cálculos</h2>
+            <form id="form-inicio">
+                <div class="input-group">
+                    <label for="inicio-mes">Mês Inicial</label>
+                    <select id="inicio-mes">
+                        <option value="1">Janeiro</option>
+                        <option value="2">Fevereiro</option>
+                        <option value="3">Março</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Maio</option>
+                        <option value="6">Junho</option>
+                        <option value="7">Julho</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Setembro</option>
+                        <option value="10">Outubro</option>
+                        <option value="11">Novembro</option>
+                        <option value="12">Dezembro</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="inicio-ano">Ano Inicial</label>
+                    <input type="number" id="inicio-ano" min="2000" placeholder="2023" required>
+                </div>
+                <button type="submit" class="btn-salvar">Salvar Início</button>
+            </form>
         </div>
     </div>
 
@@ -164,7 +264,13 @@
                 <div id="config-adiantamento" class="hidden">
                     <div class="input-group">
                         <label for="porcentagem-adiantamento">Porcentagem do Adiantamento</label>
-                        <input type="number" id="porcentagem-adiantamento" min="0" max="100" placeholder="40" value="40">
+                        <input 
+                            type="text" 
+                            id="porcentagem-adiantamento" 
+                            pattern="^[0-9]+([,.][0-9]+)?$"
+                            placeholder="40"
+                            value="40"
+                        >
                         <span class="porcentagem-simbolo">%</span>
                     </div>
                     
@@ -179,12 +285,61 @@
                     </div>
                 </div>
                 
+                <!-- NOVO: Se quer investir -->
+                <div class="input-group checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="quer-investir">
+                        Quero Investir
+                    </label>
+                </div>
+                <!-- Bloco de campos de investimento, oculto por padrão -->
+                <div id="config-investimento" class="hidden">
+                    <div class="input-group">
+                        <label for="invest-porcentagem">Investir (% do salário):</label>
+                        <input type="number" id="invest-porcentagem" min="0" max="100" placeholder="Ex: 10">
+                    </div>
+                    <div class="input-group">
+                        <label for="invest-manual">Investir (valor fixo):</label>
+                        <input type="number" id="invest-manual" min="0" step="0.01" placeholder="Ex: 500.00">
+                    </div>
+                </div>
+                <!-- NOVO: Exibição da previsão do salário após investimento -->
+                <div class="input-group previsao-salario">
+                    <label>Salário Previsto:</label>
+                    <div id="invest-predicted" class="previsao-container"></div>
+                </div>
+                
                 <button type="submit" class="btn-salvar">Salvar Configuração</button>
             </form>
         </div>
     </div>
 
+    <!-- Aqui entram os 3 cards fixos no rodapé -->
+    <footer class="footer-cards">
+        <div class="footer-card">
+            <span class="card-title">Total Entradas</span>
+            <span id="footer-entradas" class="card-value">R$ 0,00</span>
+        </div>
+        <div class="footer-card">
+            <span class="card-title">Total Saídas</span>
+            <span id="footer-saidas" class="card-value">R$ 0,00</span>
+        </div>
+        <div class="footer-card">
+            <span class="card-title">Performance</span>
+            <span id="footer-performance" class="card-value">R$ 0,00</span>
+        </div>
+        <div class="footer-card">
+            <span class="card-title">Gasto Diário Disponível</span>
+            <span id="footer-diario" class="card-value">R$ 0,00</span>
+        </div>
+        <div class="footer-card">
+            <span class="card-title">Investimento</span>
+            <span id="footer-investimento" class="card-value">R$ 0,00</span>
+        </div>
+    </footer>
+    
+
     <div id="backdrop" class="backdrop"></div>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

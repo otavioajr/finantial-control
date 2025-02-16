@@ -17,6 +17,8 @@
 body {
     background-color: var(--background-color);
     color: var(--text-color);
+    /* Ajuste para não esconder conteúdo atrás do footer fixo */
+    margin-bottom: 120px; /* Reserve espaço para o rodapé fixo */
 }
 
 .container {
@@ -55,17 +57,32 @@ nav {
     color: white;
 }
 
+.nav-btn#btn-salvar-historico {
+    font-size: 1.2rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Ajustar o layout dos cards */
 .cards-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Ajustar minmax */
     gap: 2rem;
 }
 
+/* Novo estilo para fazer o card de múltiplas despesas ocupar toda a largura */
+#card-multiple-expenses {
+    grid-column: 1 / -1; /* Faz ocupar todas as colunas disponíveis */
+    margin-top: 1rem; 
+    padding: 10px;   /* Espaçamento do topo */
+}
+
+/* Fazer cards ocuparem largura total */
 .card {
     background-color: var(--card-background);
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .card h2 {
@@ -204,13 +221,13 @@ tr:nth-child(even) {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    margin-bottom: 0;
 }
 
 .checkbox-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    cursor: pointer;
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -244,7 +261,8 @@ tr:nth-child(even) {
 .floating-button {
     position: fixed;
     left: 20px;
-    bottom: 20px;
+    /* Em vez de bottom: 20px, use um valor maior, ex: 90px */
+    bottom: 150px;
     width: 56px;
     height: 56px;
     border-radius: 50%;
@@ -261,6 +279,7 @@ tr:nth-child(even) {
     transition: transform 0.2s, background-color 0.2s;
 }
 
+
 .floating-button:hover {
     transform: scale(1.1);
     background-color: #1d4ed8;
@@ -275,7 +294,7 @@ tr:nth-child(even) {
 .config-panel {
     position: fixed;
     left: -400px;
-    bottom: 90px;
+    bottom: 150px;
     width: 350px;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
@@ -347,7 +366,6 @@ tr:nth-child(even) {
     content: attr(title);
     position: absolute;
     left: 0;
-    /* Use bottom: 100% para que o tooltip apareça acima na última linha */
     bottom: 100%;
     background-color: rgba(30, 41, 59, 0.9);
     color: white;
@@ -367,3 +385,412 @@ tr:nth-child(even) {
     color: #b0b0b0;
     font-style: italic;
 }
+
+.non-business {
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-style: italic;
+}
+
+#inicio-calc-panel {
+    top: -400px;
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+    bottom: auto;
+}
+
+#inicio-calc-panel.active {
+    top: 60px;
+}
+
+/* ---- Rodapé fixo com 3 cards ---- */
+.footer-cards {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem 2rem;
+    background-color: var(--card-background);
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 2000;
+}
+
+.footer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.card-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.saldo-negativo {
+    background-color: #fee2e2; /* vermelho suave */
+    color: #dc2626;            /* opcional, texto levemente avermelhado */
+}
+
+.saldo-positivo {
+    background-color: #ecfdf5; /* verde suave */
+    color: #16a34a;            /* opcional, texto levemente esverdeado */
+}
+
+.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.input-group.checkbox-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.valor-positivo {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.valor-negativo {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+#tabela-historico {
+    width: 100%;
+    margin-top: 1rem;
+}
+
+#tabela-historico th {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 1rem;
+}
+
+#tabela-historico td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.btn-excluir {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    opacity: 0.7;
+    transition: opacity 0.3s;
+}
+
+.btn-excluir:hover {
+    opacity: 1;
+}
+
+/* Ajustar layout das múltiplas despesas */
+.expense-item {
+    display: grid;
+    grid-template-columns: min-content 1fr 1fr 2fr minmax(100px, auto); /* Ajustado última coluna */
+    gap: 0.5rem; /* Reduzido o gap */
+    margin: 0;  /* Removida margin */
+    align-items: center;
+    padding: 0.75rem; /* Reduzido o padding */
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+}
+
+.expense-item .remove-expense {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0 0 0 0;  /* Removido padding */
+    width: 24px;  /* Largura fixa */
+    height: 24px; /* Altura fixa */
+    line-height: 1;  /* Alinhamento vertical do × */
+    display: flex;  /* Flex para centralizar o × */
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s, transform 0.2s;
+    border-radius: 50%;  /* Formato circular */
+}
+
+.expense-item .remove-expense:hover {
+    opacity: 0.7;
+    transform: scale(1.1);  /* Efeito de hover */
+    background-color: rgba(220, 38, 38, 0.1);  /* Fundo vermelho suave no hover */
+}
+
+.expense-item .checkbox-group {
+    display: flex;
+    gap: 0.5rem; /* Reduzido o gap */
+    white-space: normal; /* Removido nowrap */
+    font-size: 0.9rem; /* Reduzido tamanho da fonte */
+    min-width: 0; /* Permite que o conteúdo seja reduzido se necessário */
+}
+
+.expense-item .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.expense-item .desc-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.expense-item .desc-container.show-parcelas {
+  grid-template-columns: 2fr 1fr;
+}
+
+.expense-item .expense-parcelas {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  width: 100%;
+}
+
+.multiple-expenses {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-add-expense {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--background-color);
+    border: 1px dashed #ccc;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.toggle-input-mode {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+#btn-toggle-mode {
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+/* Estilos para múltiplas despesas */
+.expense-item {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr 2fr auto;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+}
+
+.expense-item input {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  width: 100%;
+}
+
+.expense-item .checkbox-group {
+  display: flex;
+  gap: 1rem;
+  white-space: nowrap;
+}
+
+.expense-item .remove-expense {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  transition: opacity 0.3s;
+}
+
+.expense-item .remove-expense:hover {
+  opacity: 0.7;
+}
+
+.btn-add-expense {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: var(--background-color);
+  border: 2px dashed #cbd5e1;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-add-expense:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+#expenses-list {
+  margin-bottom: 1rem;
+}
+
+.previsao-salario {
+    background-color: #f8fafc;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+}
+
+.previsao-container {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-color);
+}
+
+.previsao-container .valor {
+    font-weight: bold;
+    color: var(--success-color);
+}
+
+.previsao-container .data {
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+/* Adicione estes estilos */
+#parcelas-container {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.helper-text {
+    display: block;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+}
+
+.meses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.mes-card {
+    background-color: var(--card-background);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mes-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mes-card.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.mes-selector {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+#ano-select {
+    padding: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    background-color: var(--card-background);
+}
+
+/* Estilos para autenticação */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 2rem;
+    background-color: var(--card-background);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.auth-tab.active {
+    border-bottom-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.auth-form .input-group {
+    margin-bottom: 1rem;
+}
+
+.auth-form .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.auth-form .btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
