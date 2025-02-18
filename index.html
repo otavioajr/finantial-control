@@ -1,346 +1,261 @@
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle Financeiro</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Controle Financeiro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="login-page">
-        <div class="login-container">
-            <h1>Controle Financeiro</h1>
-            <div class="auth-tabs">
-                <button class="auth-tab" data-tab="login">Login</button>
-                <button class="auth-tab" data-tab="register">Registro</button>
+    <main class="auth-container">
+        <div class="auth-wrapper">
+            <div class="auth-header">
+                <img src="assets/logo.png" alt="Logo" class="auth-logo">
+                <h1>Controle Financeiro</h1>
+                <p class="auth-subtitle">Gerencie suas finanças de forma simples e eficiente</p>
             </div>
             
-            <form id="login-form" class="auth-form">
-                <div class="input-group">
-                    <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required>
-                </div>
-                <div class="input-group">
-                    <label for="login-password">Senha</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" class="btn-primary">Entrar</button>
-            </form>
-
-            <form id="register-form" class="auth-form">
-                <div class="input-group">
-                    <label for="register-email">Email</label>
-                    <input type="email" id="register-email" required>
-                </div>
-                <div class="input-group">
-                    <label for="register-password">Senha</label>
-                    <input type="password" id="register-password" required>
-                </div>
-                <div class="input-group">
-                    <label for="register-password-confirm">Confirmar Senha</label>
-                    <input type="password" id="register-password-confirm" required>
-                </div>
-                <button type="submit" class="btn-primary">Registrar</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="app-container" class="hidden">
-  <div class="container">
-        <header>
-            <h1>Controle Financeiro</h1>
-            <nav>
-                <button class="nav-btn active" id="btn-main">Principal</button>
-                <button class="nav-btn" id="btn-relatorio">Relatório Mensal</button>
-                <button class="nav-btn" id="btn-salvar-historico" title="Salvar Histórico">💾</button>
-                <button class="nav-btn" id="inicio-calc-btn" title="Configurar Início dos Cálculos">
-                    ⚙
-                </button>
-                <button class="nav-btn" id="btn-logout" title="Sair">🚪</button>
-            </nav>
-        </header>
-
-        <main id="main-page">
-            <div class="cards-container">
-                <!-- Card de Receitas -->
-                <div class="card receitas">
-                    <h2>Adicionar Receita</h2>
-                    <form id="form-receita">
+            <div class="auth-forms">
+                <div class="auth-card" id="loginCard">
+                    <h2>Bem-vindo de volta!</h2>
+                    <p class="auth-card-subtitle">Entre com suas credenciais</p>
+                    
+                    <form class="auth-form">
                         <div class="input-group">
-                            <label for="valor-receita">Valor</label>
-                            <input type="number" id="valor-receita" step="0.01" placeholder="R$ 0,00" required>
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" placeholder="seu.email@exemplo.com">
+                            <span class="error-message" id="loginEmailError"></span>
                         </div>
                         
                         <div class="input-group">
-                            <label for="data-receita">Data</label>
-                            <input type="date" id="data-receita" required>
+                            <label for="loginSenha">Senha</label>
+                            <div class="password-input">
+                                <input type="password" id="loginSenha" placeholder="Digite sua senha">
+                                <button type="button" class="toggle-password" aria-label="Mostrar senha">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span class="error-message" id="loginSenhaError"></span>
                         </div>
                         
-                        <div class="input-group">
-                            <label for="desc-receita">Descrição</label>
-                            <input type="text" id="desc-receita" placeholder="Descrição da receita">
-                        </div>
+                        <button type="button" id="btnLogin" class="btn-primary">Entrar</button>
                         
-                        <button type="submit" class="btn-salvar">Adicionar Receita</button>
+                        <p class="auth-link">
+                            Não tem uma conta? 
+                            <a href="#" id="showRegister">Cadastre-se aqui</a>
+                        </p>
                     </form>
                 </div>
 
-                <!-- Card de Despesas -->
-                <div class="card despesas">
-                    <h2>Adicionar Despesa</h2>
-                    <form id="form-despesa">
+                <div class="auth-card" id="registerCard" style="display: none;">
+                    <h2>Criar Conta</h2>
+                    <p class="auth-card-subtitle">Preencha seus dados para começar</p>
+                    
+                    <form class="auth-form">
                         <div class="input-group">
-                            <label for="valor-despesa">Valor</label>
-                            <input type="number" id="valor-despesa" step="0.01" placeholder="R$ 0,00" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="data-despesa">Data</label>
-                            <input type="date" id="data-despesa" required>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="desc-despesa">Descrição</label>
-                            <input type="text" id="desc-despesa" placeholder="Descrição da despesa">
+                            <label for="cadastroUsuario">Nome de Usuário</label>
+                            <input type="text" id="cadastroUsuario" placeholder="Como deseja ser chamado">
+                            <span class="error-message" id="cadastroUsuarioError"></span>
                         </div>
 
-                        <div class="input-group checkbox-container">
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="radio" id="despesa-fixa" name="tipo-despesa" value="fixa">
-                                    Despesa Fixa
-                                </label>
-                            </div>
-                            <div class="checkbox-group">
-                                <label class="checkbox-label">
-                                    <input type="radio" id="despesa-diaria" name="tipo-despesa" value="diaria" checked>
-                                    Despesa Diária
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Novo campo para parcelas -->
-                        <div class="input-group" id="parcelas-container" style="display: none;">
-                            <label for="num-parcelas">Número de Parcelas</label>
-                            <input type="number" id="num-parcelas" min="1" max="48" value="1" placeholder="Ex: 12">
-                            <small class="helper-text">Máximo de 48 parcelas</small>
+                        <div class="input-group">
+                            <label for="cadastroEmail">Email</label>
+                            <input type="email" id="cadastroEmail" placeholder="seu.email@exemplo.com">
+                            <span class="error-message" id="cadastroEmailError"></span>
                         </div>
                         
-                        <button type="submit" class="btn-salvar">Adicionar Despesa</button>
+                        <div class="input-group">
+                            <label for="cadastroSenha">Senha</label>
+                            <div class="password-input">
+                                <input type="password" id="cadastroSenha" placeholder="Mínimo 6 caracteres">
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span class="error-message" id="cadastroSenhaError"></span>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="confirmaSenha">Confirmar Senha</label>
+                            <div class="password-input">
+                                <input type="password" id="confirmaSenha" placeholder="Digite sua senha novamente">
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <span class="error-message" id="confirmaSenhaError"></span>
+                        </div>
+                        
+                        <button type="button" id="btnCadastro" class="btn-primary">Criar Conta</button>
+                        
+                        <p class="auth-link">
+                            Já tem uma conta? 
+                            <a href="#" id="showLogin">Faça login aqui</a>
+                        </p>
                     </form>
                 </div>
-
-                <!-- Adicionar um novo card separado para Múltiplas Despesas -->
-                <div class="card multiple-expenses" id="card-multiple-expenses">
-                    <h2>Adicionar Múltiplas Despesas</h2>
-                    <div class="expenses-list" id="expenses-list">
-                        <!-- Despesas serão adicionadas aqui dinamicamente -->
-                    </div>
-                    <button type="button" class="btn-add-expense">+ Adicionar Despesa</button>
-                    <button type="button" class="btn-salvar" id="btn-save-multiple">Salvar Todas</button>
-                </div>
-            </div>
-        </main>
-
-        <div id="relatorio-page" class="hidden">
-            <div class="relatorio-container">
-                <div class="mes-selector">
-                    <select id="ano-select"></select>
-                </div>
-                <div class="meses-grid">
-                    <div class="mes-card" data-mes="1">Janeiro</div>
-                    <div class="mes-card" data-mes="2">Fevereiro</div>
-                    <div class="mes-card" data-mes="3">Março</div>
-                    <div class="mes-card" data-mes="4">Abril</div>
-                    <div class="mes-card" data-mes="5">Maio</div>
-                    <div class="mes-card" data-mes="6">Junho</div>
-                    <div class="mes-card" data-mes="7">Julho</div>
-                    <div class="mes-card" data-mes="8">Agosto</div>
-                    <div class="mes-card" data-mes="9">Setembro</div>
-                    <div class="mes-card" data-mes="10">Outubro</div>
-                    <div class="mes-card" data-mes="11">Novembro</div>
-                    <div class="mes-card" data-mes="12">Dezembro</div>
-                </div>
-                <div class="tabela-container">
-                    <table id="tabela-financeira">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Entrada</th>
-                                <th>Saída</th>
-                                <th>Diário</th>
-                                <th>Saldo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-body">
-                            <!-- Linhas serão geradas via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
+    </main>
 
-        <div id="historico-page" class="hidden">
-            <div class="relatorio-container">
-                <h2>Histórico de Transações</h2>
-                <div class="tabela-container">
-                    <table id="tabela-historico">
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Tipo</th>
-                                <th>Valor</th>
-                                <th>Descrição</th>
-                                <th>Categoria</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historico-body">
-                            <!-- Linhas serão geradas via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Popup do painel de configuração do Início dos Cálculos -->
-    <div id="inicio-calc-panel" class="config-panel">
-        <div class="card config-salarial">
-            <h2>Configurar Início dos Cálculos</h2>
-            <form id="form-inicio">
-                <div class="input-group">
-                    <label for="inicio-mes">Mês Inicial</label>
-                    <select id="inicio-mes">
-                        <option value="1">Janeiro</option>
-                        <option value="2">Fevereiro</option>
-                        <option value="3">Março</option>
-                        <option value="4">Abril</option>
-                        <option value="5">Maio</option>
-                        <option value="6">Junho</option>
-                        <option value="7">Julho</option>
-                        <option value="8">Agosto</option>
-                        <option value="9">Setembro</option>
-                        <option value="10">Outubro</option>
-                        <option value="11">Novembro</option>
-                        <option value="12">Dezembro</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label for="inicio-ano">Ano Inicial</label>
-                    <input type="number" id="inicio-ano" min="2000" placeholder="2023" required>
-                </div>
-                <button type="submit" class="btn-salvar">Salvar Início</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Botão flutuante e painel de configuração -->
-    <button id="config-button" class="floating-button">
-        <span class="dollar-sign">$</span>
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+        🌓
     </button>
-    
-    <div id="config-panel" class="config-panel">
-        <div class="card config-salarial">
-            <h2>Configuração Salarial</h2>
-            <form id="form-salario">
-                <div class="input-group">
-                    <label for="valor-salario">Salário Base</label>
-                    <input type="number" id="valor-salario" step="0.01" placeholder="R$ 0,00" required>
-                </div>
-                
-                <div class="input-group checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="tem-adiantamento">
-                        Recebe Adiantamento
-                    </label>
-                </div>
-                
-                <div class="input-group dia-salario-único">
-                    <label for="dia-salario">Dia do Recebimento</label>
-                    <input type="number" id="dia-salario" min="1" max="31" placeholder="5">
-                </div>
 
-                <div id="config-adiantamento" class="hidden">
-                    <div class="input-group">
-                        <label for="porcentagem-adiantamento">Porcentagem do Adiantamento</label>
-                        <input 
-                            type="text" 
-                            id="porcentagem-adiantamento" 
-                            pattern="^[0-9]+([,.][0-9]+)?$"
-                            placeholder="40"
-                            value="40"
-                        >
-                        <span class="porcentagem-simbolo">%</span>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="dia-adiantamento">Dia do Adiantamento</label>
-                        <input type="number" id="dia-adiantamento" min="1" max="31" placeholder="15">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label for="dia-pagamento">Dia do Pagamento</label>
-                        <input type="number" id="dia-pagamento" min="1" max="31" placeholder="30">
-                    </div>
-                </div>
-                
-                <!-- NOVO: Se quer investir -->
-                <div class="input-group checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="quer-investir">
-                        Quero Investir
-                    </label>
-                </div>
-                <!-- Bloco de campos de investimento, oculto por padrão -->
-                <div id="config-investimento" class="hidden">
-                    <div class="input-group">
-                        <label for="invest-porcentagem">Investir (% do salário):</label>
-                        <input type="number" id="invest-porcentagem" min="0" max="100" placeholder="Ex: 10">
-                    </div>
-                    <div class="input-group">
-                        <label for="invest-manual">Investir (valor fixo):</label>
-                        <input type="number" id="invest-manual" min="0" step="0.01" placeholder="Ex: 500.00">
-                    </div>
-                </div>
-                <!-- NOVO: Exibição da previsão do salário após investimento -->
-                <div class="input-group previsao-salario">
-                    <label>Salário Previsto:</label>
-                    <div id="invest-predicted" class="previsao-container"></div>
-                </div>
-                
-                <button type="submit" class="btn-salvar">Salvar Configuração</button>
-            </form>
-        </div>
-    </div>
+    <script type="module">
+        import { login, register, checkAuth, checkEmailExists } from "./auth.js";
 
-    <!-- Aqui entram os 3 cards fixos no rodapé -->
-    <footer class="footer-cards">
-        <div class="footer-card">
-            <span class="card-title">Total Entradas</span>
-            <span id="footer-entradas" class="card-value">R$ 0,00</span>
-        </div>
-        <div class="footer-card">
-            <span class="card-title">Total Saídas</span>
-            <span id="footer-saidas" class="card-value">R$ 0,00</span>
-        </div>
-        <div class="footer-card">
-            <span class="card-title">Performance</span>
-            <span id="footer-performance" class="card-value">R$ 0,00</span>
-        </div>
-        <div class="footer-card">
-            <span class="card-title">Gasto Diário Disponível</span>
-            <span id="footer-diario" class="card-value">R$ 0,00</span>
-        </div>
-        <div class="footer-card">
-            <span class="card-title">Investimento</span>
-            <span id="footer-investimento" class="card-value">R$ 0,00</span>
-        </div>
-    </footer>
-    
+        // Função para alternar entre formulários
+        function toggleForms(showRegister = false) {
+            document.getElementById('loginCard').style.display = showRegister ? 'none' : 'block';
+            document.getElementById('registerCard').style.display = showRegister ? 'block' : 'none';
+            // Limpa os campos e mensagens de erro
+            clearErrors();
+            clearInputs();
+        }
 
-    <div id="backdrop" class="backdrop"></div>
-    <script type="module" src="script.js"></script>
+        // Função para limpar mensagens de erro
+        function clearErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(element => element.textContent = '');
+        }
+
+        // Função para limpar inputs
+        function clearInputs() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+        }
+
+        // Função para validar email
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Função para validar senha
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+        // Event listeners para alternar entre forms
+        document.getElementById('showRegister').onclick = (e) => {
+            e.preventDefault();
+            toggleForms(true);
+        };
+
+        document.getElementById('showLogin').onclick = (e) => {
+            e.preventDefault();
+            toggleForms(false);
+        };
+
+        // Login
+        document.getElementById("btnLogin").onclick = async () => {
+            clearErrors();
+            const email = document.getElementById("loginEmail").value.trim();
+            const senha = document.getElementById("loginSenha").value;
+            let isValid = true;
+            
+            if (!email) {
+                document.getElementById("loginEmailError").textContent = "Digite seu email";
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                document.getElementById("loginEmailError").textContent = "Email inválido";
+                isValid = false;
+            }
+            
+            if (!senha) {
+                document.getElementById("loginSenhaError").textContent = "Digite sua senha";
+                isValid = false;
+            }
+            
+            if (isValid) {
+                try {
+                    await login(email, senha);
+                } catch (error) {
+                    if (error.message === 'Senha incorreta') {
+                        document.getElementById("loginSenhaError").textContent = "Senha incorreta";
+                    } else if (error.message === 'Usuário não encontrado') {
+                        if (confirm("Email não cadastrado. Deseja criar uma conta?")) {
+                            toggleForms(true);
+                            document.getElementById("cadastroEmail").value = email;
+                            return;
+                        }
+                    } else {
+                        alert("Erro ao fazer login: " + error.message);
+                    }
+                }
+            }
+        };
+
+        // Cadastro
+        document.getElementById("btnCadastro").onclick = async () => {
+            clearErrors();
+            const usuario = document.getElementById("cadastroUsuario").value.trim();
+            const email = document.getElementById("cadastroEmail").value.trim();
+            const senha = document.getElementById("cadastroSenha").value;
+            const confirmaSenha = document.getElementById("confirmaSenha").value;
+            let isValid = true;
+            
+            if (!usuario) {
+                document.getElementById("cadastroUsuarioError").textContent = "Digite seu usuário";
+                isValid = false;
+            }
+            
+            if (!email) {
+                document.getElementById("cadastroEmailError").textContent = "Digite seu email";
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                document.getElementById("cadastroEmailError").textContent = "Email inválido";
+                isValid = false;
+            }
+            
+            if (!senha) {
+                document.getElementById("cadastroSenhaError").textContent = "Digite sua senha";
+                isValid = false;
+            } else if (!validatePassword(senha)) {
+                document.getElementById("cadastroSenhaError").textContent = "A senha deve ter pelo menos 6 caracteres";
+                isValid = false;
+            }
+            
+            if (!confirmaSenha) {
+                document.getElementById("confirmaSenhaError").textContent = "Confirme sua senha";
+                isValid = false;
+            } else if (senha !== confirmaSenha) {
+                document.getElementById("confirmaSenhaError").textContent = "As senhas não coincidem";
+                isValid = false;
+            }
+            
+            if (isValid) {
+                try {
+                    const emailExists = await checkEmailExists(email);
+                    if (emailExists) {
+                        document.getElementById("cadastroEmailError").textContent = "Este email já está cadastrado";
+                        return;
+                    }
+                    await register(email, senha, usuario);
+                } catch (error) {
+                    alert("Erro ao cadastrar: " + error.message);
+                }
+            }
+        };
+
+        // Toggle password visibility
+        document.querySelectorAll('.toggle-password').forEach(button => {
+            button.addEventListener('click', () => {
+                const input = button.previousElementSibling;
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    button.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                } else {
+                    input.type = 'password';
+                    button.innerHTML = '<i class="fas fa-eye"></i>';
+                }
+            });
+        });
+    </script>
+
+    <script src="theme.js"></script>
 </body>
 </html>

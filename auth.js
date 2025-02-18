@@ -1,142 +1,97 @@
-import { 
-  loginUser, 
-  registerUser, 
-  logoutUser, 
-  onAuthChange,
-  getUserData,
-  updateUserData 
-} from './firebase-config.js';
+import { auth, db } from "./firebase-config.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  fetchSignInMethodsForEmail
+} from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-let currentUser = null;
-
-export function initAuth() {
-  return new Promise((resolve) => {
-    const unsubscribe = onAuthChange((user) => {
-      currentUser = user;
-      console.log('Estado de autenticação:', user ? 'Autenticado' : 'Não autenticado');
-      
-      if (user) {
-        showApp();
-        // Carrega os dados em segundo plano
-        loadUserData()
-          .then(() => {
-            resolve(user);
-          })
-          .catch((error) => {
-            console.error('Erro ao carregar dados:', error);
-            resolve(user);
-          });
-      } else {
-        showLogin();
-        resolve(null);
-      }
-    });
-
-    // Adicionar cleanup para evitar memory leaks
-    window.addEventListener('unload', () => {
-      unsubscribe();
-    });
-  });
+// Função simples para verificar autenticação
+export function isAuthenticated() {
+  return auth.currentUser !== null;
 }
 
-export async function login(username, password) {
+// Verifica se email existe
+export async function checkEmailExists(email) {
   try {
-    await loginUser(username, password);
+    const methods = await fetchSignInMethodsForEmail(auth, email);
+    return methods && methods.length > 0;  // Retorna true se houver métodos de login para o email
   } catch (error) {
+    console.error("Erro ao verificar email:", error);
+    // Se o erro for auth/invalid-email, retorna false em vez de lançar erro
+    if (error.code === 'auth/invalid-email') {
+      return false;
+    }
+    throw error; // Lança outros tipos de erro
+  }
+}
+
+// Login com validação melhorada
+export async function login(email, password) {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    if (userCredential.user) {
+      localStorage.setItem('userLoggedIn', 'true');
+      window.location.href = 'home.html';
+    }
+  } catch (error) {
+    console.error("Erro no login:", error);
+    localStorage.removeItem('userLoggedIn');
+    
+    // Trata erros específicos
+    if (error.code === 'auth/wrong-password') {
+      throw new Error('Senha incorreta');
+    } else if (error.code === 'auth/user-not-found') {
+      throw new Error('Usuário não encontrado');
+    } else {
+      throw error; // Lança outros tipos de erro
+    }
+  }
+}
+
+// Registro com dados adicionais
+export async function register(email, password, username) {
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Salva dados adicionais do usuário
+    await setDoc(doc(db, "users", user.uid), {
+      username: username,
+      email: email,
+      createdAt: new Date(),
+    });
+
+    window.location.href = "home.html";
+  } catch (error) {
+    console.error("Erro ao cadastrar:", error);
     throw error;
   }
 }
 
-export async function register(email, password) {
-  try {
-    await registerUser(email, password);
-    // Removido o login automático após o registro
-  } catch (error) {
-    throw error;
-  }
-}
-
+// Certifique-se que a função logout está exportada corretamente
 export async function logout() {
   try {
-    await logoutUser();
+    await signOut(auth);
+    localStorage.removeItem('userLoggedIn');
+    window.location.href = 'index.html';
   } catch (error) {
-    throw error;
+    console.error("Erro ao fazer logout:", error);
+    alert("Erro ao fazer logout: " + error.message);
   }
 }
 
-export async function saveUserData(data) {
-  if (!currentUser) return;
-  try {
-    await updateUserData(currentUser.uid, data);
-  } catch (error) {
-    throw error;
-  }
-}
-
-export function isCurrentUserAdmin() {
-  return currentUser?.isAdmin || false;
-}
-
-async function loadUserData() {
-  if (!currentUser) {
-    console.log('Nenhum usuário autenticado');
-    return;
-  }
-  
-  try {
-    return getUserData(currentUser.uid).then(data => {
-      if (!data) {
-        console.log('Nenhum dado encontrado para o usuário');
-        return;
+// E que a função checkAuth está correta
+export function checkAuth() {
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user && !window.location.pathname.endsWith('index.html')) {
+        window.location.replace('index.html');
       }
-
-      currentUser.isAdmin = data.isAdmin;
-      
-      // Importar dinamicamente e carregar as transações
-      import('./finance.js').then(({ carregarTransacoes, configSalarial }) => {
-        // Carregar transações
-        carregarTransacoes(data);
-        
-        // Atualizar configuração salarial
-        if (data.configSalarial) {
-          Object.assign(configSalarial, data.configSalarial);
-        }
-        
-        // Disparar evento de dados carregados
-        window.dispatchEvent(new CustomEvent('userDataLoaded', { 
-          detail: data,
-          bubbles: true 
-        }));
-      });
-
-      return data;
+      unsubscribe();
+      resolve(user);
     });
-  } catch (error) {
-    console.error('Erro ao carregar dados:', error);
-  }
-}
-
-function showApp() {
-  console.log('Usuário logado, exibindo app');
-  document.getElementById('login-page').classList.add('hidden'); // Corrigido: deve ser add, não remove
-  document.getElementById('app-container').classList.remove('hidden');
-}
-
-function showLogin() {
-  document.getElementById('login-page').classList.remove('hidden');
-  document.getElementById('app-container').classList.add('hidden');
-  
-  // Garantir que os formulários de autenticação estejam visíveis
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-  
-  // Mostrar o formulário de login por padrão
-  if (loginForm) {
-    loginForm.classList.add('active');
-    document.querySelector('.auth-tab[data-tab="login"]')?.classList.add('active');
-  }
-  if (registerForm) {
-    registerForm.classList.remove('active');
-    document.querySelector('.auth-tab[data-tab="register"]')?.classList.remove('active');
-  }
+  });
 }

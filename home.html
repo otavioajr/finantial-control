@@ -1,0 +1,313 @@
+<!-- home.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home - Controle Financeiro</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <h1>Controle Financeiro</h1>
+      <ul>
+        <li><a href="home.html">Início</a></li>
+        <li><a href="relatorio.html">Relatório Mensal</a></li>
+        <li><a href="historico.html">Histórico</a></li>
+        <li><a href="configuracoes.html">Configurações</a></li>
+        <li><button id="btnLogout">Sair</button></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <h2>Adicionar Receita / Despesa</h2>
+
+      <div class="finance-form">
+        <div class="card">
+          <h3>Adicionar Receita</h3>
+          <label for="receitaValor">Valor</label>
+          <input type="number" id="receitaValor" placeholder="R$ 0,00" />
+          
+          <label for="receitaData">Data</label>
+          <input type="date" id="receitaData" />
+
+          <label for="receitaDesc">Descrição</label>
+          <input type="text" id="receitaDesc" placeholder="Descrição da receita" />
+
+          <button id="btnAdicionarReceita" class="btn-green">Adicionar Receita</button>
+        </div>
+
+        <div class="card">
+          <h3>Adicionar Despesa</h3>
+          <label for="despesaValor">Valor</label>
+          <input type="number" id="despesaValor" placeholder="R$ 0,00" />
+          
+          <label for="despesaData">Data</label>
+          <input type="date" id="despesaData" />
+
+          <label for="despesaDesc">Descrição</label>
+          <input type="text" id="despesaDesc" placeholder="Descrição da despesa" />
+
+          <div class="tipo-despesa">
+            <div class="tipo-despesa-opcao">
+              <input type="radio" name="tipoDespesa" id="despesaFixa" value="fixa" />
+              <label for="despesaFixa">Despesa Fixa</label>
+            </div>
+            
+            <div class="tipo-despesa-opcao">
+              <input type="radio" name="tipoDespesa" id="despesaDiaria" value="diaria" checked />
+              <label for="despesaDiaria">Despesa Diária</label>
+            </div>
+          </div>
+
+          <div id="mesesRepeticao" class="meses-repeticao">
+            <label for="qtdMeses">Quantidade de meses</label>
+            <input type="number" id="qtdMeses" min="1" max="12" value="1" placeholder="Quantidade de meses">
+          </div>
+
+          <button id="btnAdicionarDespesa" class="btn-red">Adicionar Despesa</button>
+        </div>
+      </div>
+
+      <div class="card multiple-expenses">
+        <h3>Adicionar Múltiplas Despesas</h3>
+        <div id="multipleExpensesContainer">
+          <!-- As linhas de despesa serão adicionadas aqui dinamicamente -->
+        </div>
+        <button id="btnNovaDespesa" class="btn-blue">+ Adicionar Despesa</button>
+        <button id="btnSalvarTodas" class="btn-green">Salvar Todas</button>
+      </div>
+    </main>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+      🌓
+    </button>
+
+    <script type="module">
+      import { checkAuth, logout } from "./auth.js";
+      import { addReceita, addDespesa, atualizarRodape } from "./finance.js";
+
+      let initialized = false;
+
+      async function init() {
+        if (initialized) return;
+        initialized = true;
+
+        try {
+          await checkAuth();
+          await atualizarRodape();
+          
+          // Configura data atual
+          const hoje = new Date().toISOString().split('T')[0];
+          document.getElementById("receitaData").value = hoje;
+          document.getElementById("despesaData").value = hoje;
+          
+          setupEventListeners();
+        } catch (error) {
+          console.error("Erro na inicialização:", error);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', init);
+
+      // Setup dos event listeners
+      function setupEventListeners() {
+        document.getElementById("btnLogout").onclick = logout;
+
+        // Event listener para adicionar receita
+        document.getElementById("btnAdicionarReceita").onclick = async () => {
+          const valor = parseFloat(document.getElementById("receitaValor").value) || 0;
+          const data = document.getElementById("receitaData").value;
+          const descricao = document.getElementById("receitaDesc").value || "Sem descrição";
+
+          if (valor > 0 && data) {
+            try {
+              const sucesso = await addReceita(valor, data, descricao);
+              if (sucesso) {
+                document.getElementById("receitaValor").value = '';
+                document.getElementById("receitaDesc").value = '';
+                await atualizarRodape();
+              }
+            } catch (error) {
+              console.error("Erro ao adicionar receita:", error);
+              alert("Erro ao adicionar receita: " + error.message);
+            }
+          } else {
+            alert("Por favor, preencha o valor e a data.");
+          }
+        };
+
+        // Event listener para adicionar despesa
+        document.getElementById("btnAdicionarDespesa").onclick = async () => {
+          const valor = parseFloat(document.getElementById("despesaValor").value) || 0;
+          const data = document.getElementById("despesaData").value;
+          const descricao = document.getElementById("despesaDesc").value || "Sem descrição";
+          const tipo = document.querySelector('input[name="tipoDespesa"]:checked').value;
+          const qtdMeses = tipo === 'fixa' ? 
+            parseInt(document.getElementById("qtdMeses").value) || 1 : 1;
+
+          if (valor > 0 && data) {
+            try {
+              const sucesso = await addDespesa(valor, data, descricao, tipo, qtdMeses);
+              if (sucesso) {
+                document.getElementById("despesaValor").value = '';
+                document.getElementById("despesaDesc").value = '';
+                await atualizarRodape();
+              }
+            } catch (error) {
+              console.error("Erro ao adicionar despesa:", error);
+              alert("Erro ao adicionar despesa: " + error.message);
+            }
+          } else {
+            alert("Por favor, preencha o valor e a data.");
+          }
+        };
+
+        // Modifique a função setupTipoDespesa no script
+        function setupTipoDespesa() {
+          const mesesRepeticao = document.getElementById('mesesRepeticao');
+          const radioDespesaFixa = document.getElementById('despesaFixa');
+          
+          function toggleMesesRepeticao() {
+            mesesRepeticao.style.display = radioDespesaFixa.checked ? 'block' : 'none';
+          }
+
+          // Adiciona o listener para ambos os radios
+          document.querySelectorAll('input[name="tipoDespesa"]').forEach(radio => {
+            radio.addEventListener('change', toggleMesesRepeticao);
+          });
+
+          // Verifica o estado inicial
+          toggleMesesRepeticao();
+        }
+
+        // Certifique-se de que o setupTipoDespesa é chamado após o DOM estar pronto
+        document.addEventListener('DOMContentLoaded', () => {
+          setupTipoDespesa();
+        });
+
+        // Função para criar uma nova linha de despesa
+        function createExpenseRow() {
+          const row = document.createElement('div');
+          row.className = 'expense-row';
+          
+          row.innerHTML = `
+            <button class="btn-remove-expense" title="Remover despesa">×</button>
+            
+            <div class="input-group">
+              <label>Valor</label>
+              <input type="number" class="expense-valor" placeholder="R$ 0,00" />
+            </div>
+            
+            <div class="input-group">
+              <label>Data</label>
+              <input type="date" class="expense-data" />
+            </div>
+            
+            <div class="input-group">
+              <label>Descrição</label>
+              <input type="text" class="expense-desc" placeholder="Descrição da despesa" />
+            </div>
+            
+            <div class="radio-group">
+              <div>
+                <input type="radio" name="tipoDespesa_${Date.now()}" class="expense-tipo" value="fixa" />
+                <label>Fixa</label>
+              </div>
+              <div>
+                <input type="radio" name="tipoDespesa_${Date.now()}" class="expense-tipo" value="diaria" checked />
+                <label>Diária</label>
+              </div>
+            </div>
+            
+            <div class="input-group meses-group" style="display: none;">
+              <label>Meses</label>
+              <input type="number" class="expense-meses" min="1" max="12" value="1" />
+            </div>
+          `;
+
+          // Configura o botão de remover
+          const btnRemove = row.querySelector('.btn-remove-expense');
+          btnRemove.addEventListener('click', () => row.remove());
+
+          // Configura a visibilidade do campo de meses
+          const radios = row.querySelectorAll('.expense-tipo');
+          const mesesGroup = row.querySelector('.meses-group');
+          
+          radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+              mesesGroup.style.display = radio.value === 'fixa' ? 'block' : 'none';
+            });
+          });
+
+          // Define a data atual
+          const dataInput = row.querySelector('.expense-data');
+          dataInput.value = new Date().toISOString().split('T')[0];
+
+          return row;
+        }
+
+        // Configurar o botão de adicionar nova despesa
+        document.getElementById('btnNovaDespesa').addEventListener('click', () => {
+          const container = document.getElementById('multipleExpensesContainer');
+          container.appendChild(createExpenseRow());
+        });
+
+        // Configurar o botão de salvar todas
+        document.getElementById('btnSalvarTodas').addEventListener('click', async () => {
+          const rows = document.querySelectorAll('.expense-row');
+          const promises = [];
+
+          for (const row of rows) {
+            const valor = parseFloat(row.querySelector('.expense-valor').value) || 0;
+            const data = row.querySelector('.expense-data').value;
+            const descricao = row.querySelector('.expense-desc').value || "Sem descrição";
+            const tipo = row.querySelector('.expense-tipo:checked').value;
+            const qtdMeses = tipo === 'fixa' ? 
+              parseInt(row.querySelector('.expense-meses').value) || 1 : 1;
+
+            if (valor > 0 && data) { // Removida validação da descrição
+              promises.push(addDespesa(valor, data, descricao, tipo, qtdMeses));
+            }
+          }
+
+          try {
+            await Promise.all(promises);
+            document.getElementById('multipleExpensesContainer').innerHTML = '';
+            await atualizarRodape();
+            alert('Todas as despesas foram salvas com sucesso!');
+          } catch (error) {
+            alert('Erro ao salvar algumas despesas: ' + error.message);
+          }
+        });
+      }
+
+      // Atualiza o rodapé quando a página carregar
+      document.addEventListener('DOMContentLoaded', async () => {
+        await checkAuth();
+        await atualizarRodape();
+      });
+    </script>
+
+    <script src="theme.js"></script>
+
+    <script type="module">
+      import { atualizarRodape } from "./finance.js";
+      
+      // Carrega o rodapé dinamicamente
+      fetch('footer.html')
+        .then(response => response.text())
+        .then(html => {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+          document.body.appendChild(tempDiv.firstElementChild);
+        })
+        .then(async () => {
+          try {
+            await atualizarRodape();
+          } catch (error) {
+            console.error("Erro ao atualizar rodapé:", error);
+          }
+        });
+    </script>
+  </body>
+</html>

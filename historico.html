@@ -1,0 +1,178 @@
+<!-- historico.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Histórico - Controle Financeiro</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <h1>Controle Financeiro</h1>
+      <ul>
+        <li><a href="home.html">Início</a></li>
+        <li><a href="relatorio.html">Relatório Mensal</a></li>
+        <li><a href="historico.html" class="active">Histórico</a></li>
+        <li><a href="configuracoes.html">Configurações</a></li>
+        <li><button id="btnLogout">Sair</button></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <h2>Histórico de Transações</h2>
+
+      <!-- Adicione os filtros aqui -->
+      <div class="filtros">
+        <div class="filtro-grupo">
+          <label for="selectAno">Ano:</label>
+          <select id="selectAno"></select>
+        </div>
+        <div class="filtro-grupo">
+          <label for="selectMes">Mês:</label>
+          <select id="selectMes">
+            <option value="1">Janeiro</option>
+            <option value="2">Fevereiro</option>
+            <option value="3">Março</option>
+            <option value="4">Abril</option>
+            <option value="5">Maio</option>
+            <option value="6">Junho</option>
+            <option value="7">Julho</option>
+            <option value="8">Agosto</option>
+            <option value="9">Setembro</option>
+            <option value="10">Outubro</option>
+            <option value="11">Novembro</option>
+            <option value="12">Dezembro</option>
+          </select>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>Valor</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="historicoTableBody">
+          <!-- Preenchido dinamicamente -->
+        </tbody>
+      </table>
+    </main>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+      🌓
+    </button>
+
+    <script type="module">
+      import { checkAuth, logout } from "./auth.js";
+      import { getAllTransacoes, deleteTransacao, atualizarRodape } from "./finance.js";
+
+      // Adicione estas variáveis globais
+      const dataAtual = new Date();
+      const anoAtual = dataAtual.getFullYear();
+      const mesAtual = dataAtual.getMonth() + 1;
+
+      async function init() {
+        try {
+          await checkAuth();
+          
+          // Popula o select de anos (5 anos para trás e 5 para frente)
+          const selectAno = document.getElementById("selectAno");
+          for (let ano = anoAtual - 5; ano <= anoAtual + 5; ano++) {
+            const option = document.createElement("option");
+            option.value = ano;
+            option.textContent = ano;
+            if (ano === anoAtual) option.selected = true;
+            selectAno.appendChild(option);
+          }
+
+          // Seleciona o mês atual
+          document.getElementById("selectMes").value = mesAtual;
+
+          // Adiciona listeners para os filtros
+          selectAno.addEventListener("change", carregarHistorico);
+          document.getElementById("selectMes").addEventListener("change", carregarHistorico);
+
+          await carregarHistorico();
+        } catch (error) {
+          console.error("Erro na inicialização:", error);
+          window.location.href = "index.html";
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        await checkAuth();
+        await init();
+        await atualizarRodape();
+      });
+      document.getElementById("btnLogout").onclick = logout;
+
+      async function carregarHistorico() {
+        const transacoes = await getAllTransacoes();
+        const tbody = document.getElementById("historicoTableBody");
+        const anoSelecionado = parseInt(document.getElementById("selectAno").value);
+        const mesSelecionado = parseInt(document.getElementById("selectMes").value);
+        
+        tbody.innerHTML = "";
+
+        // Filtra as transações pelo ano e mês selecionados
+        const transacoesFiltradas = transacoes.filter(item => {
+          const data = item.data.toDate();
+          return data.getFullYear() === anoSelecionado && 
+                 data.getMonth() + 1 === mesSelecionado;
+        });
+
+        // Ordena transações por data (mais recentes primeiro)
+        transacoesFiltradas.sort((a, b) => b.data.toDate() - a.data.toDate());
+
+        transacoesFiltradas.forEach((item) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${item.data.toDate().toLocaleDateString('pt-BR')}</td>
+            <td>${item.tipo}</td>
+            <td>R$ ${item.valor.toFixed(2)}</td>
+            <td>${item.descricao}</td>
+            <td>${item.tipoDespesa || "-"}</td>
+            <td>
+              <button class="btn-delete" data-id="${item.id}">Excluir</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Adiciona listeners para os botões de excluir
+        document.querySelectorAll(".btn-delete").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            if (confirm("Deseja realmente excluir esta transação?")) {
+              const id = btn.dataset.id;
+              await deleteTransacao(id);
+              await carregarHistorico();
+            }
+          });
+        });
+
+        await atualizarRodape(); // Adicione esta linha após atualizar a tabela
+      }
+    </script>
+
+    <!-- Modifique o script de carregamento do rodapé -->
+    <script type="module">
+      fetch('footer.html')
+        .then(response => response.text())
+        .then(html => {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+          document.body.appendChild(tempDiv.firstElementChild);
+        })
+        .then(() => {
+          import('./finance.js').then(module => {
+            module.atualizarRodape();
+          });
+        });
+    </script>
+  </body>
+</html>

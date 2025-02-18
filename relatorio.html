@@ -1,0 +1,144 @@
+<!-- relatorio.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Relatório Mensal - Controle Financeiro</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <h1>Controle Financeiro</h1>
+      <ul>
+        <li><a href="home.html">Início</a></li>
+        <li><a href="relatorio.html" class="active">Relatório Mensal</a></li>
+        <li><a href="historico.html">Histórico</a></li>
+        <li><a href="configuracoes.html">Configurações</a></li>
+        <li><button id="btnLogout">Sair</button></li>
+      </ul>
+    </nav>
+
+    <main class="container">
+      <div class="report-header">
+        <h2>Relatório Mensal</h2>
+        <select id="selectAno" class="year-select">
+          <!-- Anos serão adicionados dinamicamente -->
+        </select>
+      </div>
+
+      <div class="report-filters">
+        <div class="months">
+          <button class="month-btn" data-mes="1">Janeiro</button>
+          <button class="month-btn" data-mes="2">Fevereiro</button>
+          <button class="month-btn" data-mes="3">Março</button>
+          <button class="month-btn" data-mes="4">Abril</button>
+          <button class="month-btn" data-mes="5">Maio</button>
+          <button class="month-btn" data-mes="6">Junho</button>
+          <button class="month-btn" data-mes="7">Julho</button>
+          <button class="month-btn" data-mes="8">Agosto</button>
+          <button class="month-btn" data-mes="9">Setembro</button>
+          <button class="month-btn" data-mes="10">Outubro</button>
+          <button class="month-btn" data-mes="11">Novembro</button>
+          <button class="month-btn" data-mes="12">Dezembro</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Entrada</th>
+            <th>Saída</th>
+            <th>Despesa Diária</th>
+            <th>Saldo</th>
+          </tr>
+        </thead>
+        <tbody id="relatorioTableBody">
+          <!-- Linhas serão adicionadas dinamicamente -->
+        </tbody>
+        <tfoot>
+          <tr>
+            <td><strong>Total</strong></td>
+            <td id="totalEntrada">R$ 0,00</td>
+            <td id="totalSaida">R$ 0,00</td>
+            <td id="totalDespesaDiaria">R$ 0,00</td>
+            <td></td>  <!-- Célula vazia para manter o alinhamento -->
+          </tr>
+        </tfoot>
+      </table>
+    </main>
+
+    <button id="themeToggle" class="theme-toggle" aria-label="Alternar tema">
+      🌓
+    </button>
+
+    <script type="module">
+      import { checkAuth, logout } from "./auth.js";
+      import { initializeReport, verificarStatusMeses } from "./finance.js";
+
+      let cleanup = null;
+
+      async function init() {
+        try {
+          await checkAuth();
+          
+          // Seleciona e marca o mês atual
+          const monthButtons = document.querySelectorAll('.month-btn');
+          const mesAtual = new Date().getMonth() + 1;
+          monthButtons.forEach(btn => {
+            if (parseInt(btn.dataset.mes) === mesAtual) {
+              btn.classList.add('selected');
+            }
+          });
+
+          const anoAtual = new Date().getFullYear();
+          // Atualiza as cores dos botões conforme o saldo diário
+          await verificarStatusMeses(anoAtual);
+
+          // Inicia o relatório e guarda a função de limpeza
+          cleanup = initializeReport();
+
+        } catch (error) {
+          console.error('Erro na inicialização:', error);
+          window.location.href = 'index.html';
+        }
+      }
+
+      // Inicializa quando o DOM estiver pronto
+      document.addEventListener('DOMContentLoaded', init);
+
+      // Setup dos event listeners
+      document.getElementById("btnLogout").onclick = logout;
+
+      // Limpa as inscrições quando sair da página
+      window.addEventListener('unload', () => {
+        if (cleanup) cleanup();
+      });
+    </script>
+
+    <!-- Substitua o script antigo do tema por esta linha em todos os arquivos HTML -->
+    <script src="theme.js"></script>
+
+    <!-- Remover este bloco de todas as páginas -->
+    <script type="text/html" id="footer-template">
+        <!-- Conteúdo do footer.html aqui -->
+    </script>
+
+    <script>
+      // Carrega o rodapé dinamicamente
+      fetch('footer.html')
+        .then(response => response.text())
+        .then(html => {
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+          document.body.appendChild(tempDiv.firstElementChild);
+        })
+        .then(() => {
+          // Atualiza os valores do rodapé após ele ser carregado
+          if (typeof atualizarRodape === 'function') {
+            atualizarRodape();
+          }
+        });
+    </script>
+  </body>
+</html>

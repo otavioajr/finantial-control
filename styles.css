@@ -1,817 +1,1388 @@
-:root {
-    --primary-color: #2563eb;
-    --success-color: #16a34a;
-    --danger-color: #dc2626;
-    --background-color: #f1f5f9;
-    --card-background: #ffffff;
-    --text-color: #1e293b;
-}
+/* styles.css */
 
+/* Reset básico */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    /* Ajuste para não esconder conteúdo atrás do footer fixo */
-    margin-bottom: 120px; /* Reserve espaço para o rodapé fixo */
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-header h1 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
-}
-
-nav {
+  }
+  
+  body {
+    font-family: "Roboto", sans-serif;
+    background: #f9f9f9;
+    color: #333;
+  }
+  
+  /* Navbar */
+  nav {
+    background: #2c3e50;
+    padding: 1rem;
     display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.nav-btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: var(--card-background);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.nav-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.nav-btn#btn-salvar-historico {
-    font-size: 1.2rem;
-    padding: 0.5rem 1rem;
-}
-
-/* Ajustar o layout dos cards */
-.cards-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); /* Ajustar minmax */
-    gap: 2rem;
-}
-
-/* Novo estilo para fazer o card de múltiplas despesas ocupar toda a largura */
-#card-multiple-expenses {
-    grid-column: 1 / -1; /* Faz ocupar todas as colunas disponíveis */
-    margin-top: 1rem; 
-    padding: 10px;   /* Espaçamento do topo */
-}
-
-/* Fazer cards ocuparem largura total */
-.card {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    width: 100%;
-}
-
-.card h2 {
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.input-group {
-    margin-bottom: 1rem;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-color);
-}
-
-.input-group input {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    font-size: 1rem;
-}
-
-.btn-salvar {
-    width: 100%;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 0.5rem;
-    background-color: var(--primary-color);
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.btn-salvar:hover {
-    background-color: #1d4ed8;
-}
-
-.receitas .btn-salvar {
-    background-color: var(--success-color);
-}
-
-.receitas .btn-salvar:hover {
-    background-color: #15803d;
-}
-
-.despesas .btn-salvar {
-    background-color: var(--danger-color);
-}
-
-.despesas .btn-salvar:hover {
-    background-color: #b91c1c;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.dia-salario-único,
-#config-adiantamento {
-    transition: opacity 0.3s ease;
-}
-
-.dia-salario-único.hidden,
-#config-adiantamento.hidden {
-    display: none;
-    opacity: 0;
-}
-
-.relatorio-container {
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.mes-selector {
-    margin-bottom: 2rem;
-    display: flex;
-    gap: 1rem;
     align-items: center;
-}
-
-.mes-selector select {
-    padding: 0.75rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
+    justify-content: space-between;
+  }
+  
+  nav h1 {
+    color: #fff;
+  }
+  
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+  }
+  
+  nav ul li a,
+  nav ul li button {
+    color: #fff;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
     font-size: 1rem;
-}
-
-#mes-select {
-    width: 200px;
-}
-
-#ano-select {
-    width: 120px;
-}
-
-.tabela-container {
-    overflow-x: auto;
-}
-
-table {
+  }
+  
+  nav ul li button:hover,
+  nav ul li a:hover {
+    text-decoration: underline;
+  }
+  
+  nav ul li .active {
+    text-decoration: underline;
+  }
+  
+  /* Container principal */
+  .container {
+    width: 100%;
+    max-width: 1200px; /* ou o valor que preferir */
+    margin: 0 auto;
+    padding: 1rem;
+    padding-bottom: 80px;
+  }
+  
+  /* Cards */
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .card h3 {
+    margin-bottom: 1rem;
+  }
+  
+  .finance-form {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  
+  .finance-form .card {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  label {
+    display: block;
+    margin: 0.5rem 0 0.2rem;
+  }
+  
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  button {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  /* Botões */
+  .btn-green {
+    background-color: #27ae60;
+    color: #fff;
+  }
+  
+  .btn-red {
+    background-color: #e74c3c;
+    color: #fff;
+  }
+  
+  .btn-blue {
+    background-color: #2980b9;
+    color: #fff;
+  }
+  
+  .btn-delete {
+    background-color: #e74c3c;
+    color: #fff;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+  }
+  
+  /* Tabelas */
+  table {
     width: 100%;
     border-collapse: collapse;
-}
-
-th, td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-th {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f8fafc;
-}
-
-/* Estilos para configuração salarial */
-.config-salarial {
-    margin-bottom: 2rem;
-    background-color: var(--card-background);
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0;
-}
-
-.checkbox-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: auto;
-    cursor: pointer;
-}
-
-#config-adiantamento {
     margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
-}
-
-#config-adiantamento .input-group {
-    position: relative;
-}
-
-.porcentagem-simbolo {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(25%);
-    color: #64748b;
-}
-
-#config-adiantamento input[type="number"] {
-    width: 100%;
-}
-
-/* Estilos para botão flutuante e painel de configuração */
-.floating-button {
-    position: fixed;
-    left: 20px;
-    /* Em vez de bottom: 20px, use um valor maior, ex: 90px */
-    bottom: 150px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1001;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-
-.floating-button:hover {
-    transform: scale(1.1);
-    background-color: #1d4ed8;
-}
-
-.dollar-sign {
-    line-height: 1;
-    font-family: Arial, sans-serif;
-    font-weight: bold;
-}
-
-.config-panel {
-    position: fixed;
-    left: -400px;
-    bottom: 150px;
-    width: 350px;
-    max-height: calc(100vh - 120px);
-    overflow-y: auto;
-    transition: left 0.3s ease;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.config-panel.active {
-    left: 20px;
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Ajuste para o card dentro do painel */
-.config-panel .config-salarial {
-    margin-bottom: 0;
-}
-
-/* Adicionar backdrop quando painel estiver aberto */
-.backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-    z-index: 999;
-}
-
-.backdrop.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Ajustes para o scroll do painel */
-.config-panel::-webkit-scrollbar {
-    width: 8px;
-}
-
-.config-panel::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.config-panel::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-.config-panel::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* Adicione estes estilos para a tabela */
-#tabela-financeira td:first-child {
-    cursor: help;
-}
-
-#tabela-financeira td[title] {
-    position: relative;
-}
-
-#tabela-financeira td[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    left: 0;
-    bottom: 100%;
-    background-color: rgba(30, 41, 59, 0.9);
-    color: white;
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.875rem;
-    z-index: 1000;
-    white-space: pre-line;
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  table th, table td {
+    padding: 0.8rem;
     text-align: left;
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    margin-bottom: 4px;
-    overflow: visible;
-}
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table thead {
+    background: #2980b9;
+    color: #fff;
+  }
+  
+  /* Remova ou comente a regra atual */
+  /* table tr:hover {
+    background: #f2f2f2;
+  } */
+  
+  /* Substitua por esta regra específica para o corpo da tabela */
+  table tbody tr:hover {
+    background: #f2f2f2;
+  }
 
-/* Nova classe para dias não úteis */
-.non-business td {
-    color: #b0b0b0;
-    font-style: italic;
-}
-
-.non-business {
-  background-color: #f3f4f6;
-  color: #6b7280;
-  font-style: italic;
-}
-
-#inicio-calc-panel {
-    top: -400px;
-    left: 50%;
-    transform: translateX(-50%);
-    right: auto;
-    bottom: auto;
-}
-
-#inicio-calc-panel.active {
-    top: 60px;
-}
-
-/* ---- Rodapé fixo com 3 cards ---- */
-.footer-cards {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 1rem 2rem;
-    background-color: var(--card-background);
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    z-index: 2000;
-}
-
-.footer-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-}
-
-.card-title {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-}
-
-.card-value {
-    font-size: 1.25rem;
-    font-weight: 700;
-}
-
-.saldo-negativo {
-    background-color: #fee2e2; /* vermelho suave */
-    color: #dc2626;            /* opcional, texto levemente avermelhado */
-}
-
-.saldo-positivo {
-    background-color: #ecfdf5; /* verde suave */
-    color: #16a34a;            /* opcional, texto levemente esverdeado */
-}
-
-.checkbox-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.input-group.checkbox-container {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-}
-
-.valor-positivo {
-    color: var(--success-color);
+  /* Adicione estes estilos para o rodapé da tabela */
+  table tfoot {
+    background: #f8f9fa;
     font-weight: bold;
-}
-
-.valor-negativo {
-    color: var(--danger-color);
+  }
+  
+  table tfoot td {
+    border-top: 2px solid #dee2e6;
+    padding: 12px 8px;
+  }
+  
+  /* Versão dark mode */
+  body.dark-theme table tfoot {
+    background: #2d2d2d;
+  }
+  
+  body.dark-theme table tfoot td {
+    border-top: 2px solid #444;
+  }
+  
+  /* Cores para os totais */
+  #totalEntrada {
+    color: #27ae60;
+  }
+  
+  #totalSaida, #totalDespesaDiaria {
+    color: #e74c3c;
+  }
+  
+  #totalSaldo {
     font-weight: bold;
-}
+  }
+  
+  /* Versão dark mode */
+  body.dark-theme #totalEntrada {
+    color: #2ecc71;
+  }
+  
+  body.dark-theme #totalSaida,
+  body.dark-theme #totalDespesaDiaria {
+    color: #e74c3c;
+  }
 
-#tabela-historico {
-    width: 100%;
-    margin-top: 1rem;
-}
+  /* Adicione estes estilos */
+  #totalSaldo {
+    font-weight: bold;
+  }
 
-#tabela-historico th {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 1rem;
-}
+  #totalSaldo.saldo-positivo {
+    color: #27ae60;
+  }
 
-#tabela-historico td {
-    padding: 0.75rem;
-    border-bottom: 1px solid #e2e8f0;
-}
+  #totalSaldo.saldo-negativo {
+    color: #e74c3c;
+  }
 
-.btn-excluir {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.2rem;
-    padding: 0.25rem;
-    opacity: 0.7;
-    transition: opacity 0.3s;
-}
+  /* Versão dark mode */
+  body.dark-theme #totalSaldo.saldo-positivo {
+    color: #2ecc71;
+  }
 
-.btn-excluir:hover {
-    opacity: 1;
-}
-
-/* Ajustar layout das múltiplas despesas */
-.expense-item {
-    display: grid;
-    grid-template-columns: min-content 1fr 1fr 2fr minmax(100px, auto); /* Ajustado última coluna */
-    gap: 0.5rem; /* Reduzido o gap */
-    margin: 0;  /* Removida margin */
-    align-items: center;
-    padding: 0.75rem; /* Reduzido o padding */
-    background-color: #f8fafc;
-    border-radius: 0.5rem;
-}
-
-.expense-item .remove-expense {
-    background: none;
-    border: none;
-    color: var(--danger-color);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0 0 0 0;  /* Removido padding */
-    width: 24px;  /* Largura fixa */
-    height: 24px; /* Altura fixa */
-    line-height: 1;  /* Alinhamento vertical do × */
-    display: flex;  /* Flex para centralizar o × */
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.3s, transform 0.2s;
-    border-radius: 50%;  /* Formato circular */
-}
-
-.expense-item .remove-expense:hover {
-    opacity: 0.7;
-    transform: scale(1.1);  /* Efeito de hover */
-    background-color: rgba(220, 38, 38, 0.1);  /* Fundo vermelho suave no hover */
-}
-
-.expense-item .checkbox-group {
+  body.dark-theme #totalSaldo.saldo-negativo {
+    color: #e74c3c;
+  }
+  
+  /* Página de Login */
+  .auth-forms {
     display: flex;
-    gap: 0.5rem; /* Reduzido o gap */
-    white-space: normal; /* Removido nowrap */
-    font-size: 0.9rem; /* Reduzido tamanho da fonte */
-    min-width: 0; /* Permite que o conteúdo seja reduzido se necessário */
-}
-
-.expense-item .checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.expense-item .desc-container {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.expense-item .desc-container.show-parcelas {
-  grid-template-columns: 2fr 1fr;
-}
-
-.expense-item .expense-parcelas {
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-  width: 100%;
-}
-
-.multiple-expenses {
+    gap: 2rem;
     margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e2e8f0;
-}
-
-.btn-add-expense {
-    width: 100%;
-    padding: 0.5rem;
+  }
+  
+  .auth-forms div {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .auth-forms h2 {
     margin-bottom: 1rem;
-    background-color: var(--background-color);
-    border: 1px dashed #ccc;
-    border-radius: 0.5rem;
-    cursor: pointer;
-}
-
-.toggle-input-mode {
-    margin-top: 1rem;
-    text-align: center;
-}
-
-#btn-toggle-mode {
+  }
+  
+  /* Months */
+  .report-filters {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .months {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .month-btn {
+    background: #eee;
+    border: 1px solid #ccc;
     padding: 0.5rem 1rem;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 0.5rem;
     cursor: pointer;
+  }
+  
+  .month-btn:hover {
+    background: #ccc;
+  }
+
+  .month-btn.selected {
+    background: #2980b9;
+    color: white;
+    border-color: #2980b9;
+  }
+
+/* Estilos para os botões dos meses */
+.month-btn {
+  padding: 8px 16px;
+  margin: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-weight: 500;
+}
+
+.month-btn.selected {
+  background: #2980b9;
+  color: white;
+  border-color: #2980b9;
+}
+
+.month-btn.mes-positivo {
+  background-color: rgba(46, 204, 113, 0.2);
+  color: #27ae60;
+  border: 1px solid #27ae60;
+}
+
+.month-btn.mes-negativo {
+  background-color: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  border: 1px solid #e74c3c;
+}
+
+/* Mantém a cor mesmo quando selecionado */
+.month-btn.selected.mes-positivo {
+  background-color: #27ae60;
+  color: white;
+  border: 1px solid #27ae60;
+}
+
+.month-btn.selected.mes-negativo {
+  background-color: #e74c3c;
+  color: white;
+  border: 1px solid #e74c3c;
+}
+
+/* Dark theme */
+body.dark-theme .month-btn {
+  background: #2d2d2d;
+  border-color: #444;
+  color: #fff;
+}
+
+body.dark-theme .month-btn.selected {
+  background: #2980b9;
+  color: white;
+  border-color: #2980b9;
+}
+
+body.dark-theme .month-btn.mes-positivo {
+  color: #2ecc71;
+  border-color: #2ecc71;
+  background-color: rgba(46, 204, 113, 0.1);
+}
+
+body.dark-theme .month-btn.mes-negativo {
+  color: #e74c3c;
+  border-color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
+}
+
+/* Report Header */
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.year-select {
+  width: auto;
+  min-width: 100px;
+  padding: 0.3rem;
+  margin: 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  appearance: auto;
+  -webkit-appearance: auto;
+  display: inline-block;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #2c3e50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* Estilo específico para o botão quando em tema escuro */
+body.dark-theme .theme-toggle {
+  background: #fff;
+  color: #2c3e50;
+}
+
+/* Ajustes de responsividade */
+@media screen and (max-width: 768px) {
+  /* Navbar responsiva */
+  nav {
+    flex-direction: column;
+    padding: 0.5rem;
+  }
+
+  nav ul {
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  nav ul li {
+    padding: 0.5rem 0;
+  }
+
+  /* Container principal */
+  .container {
+    padding: 0.5rem;
+    margin: 1rem auto;
+    padding-bottom: 80px;
+  }
+
+  /* Finance form */
+  .finance-form {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .finance-form .card {
+    min-width: 100%;
+  }
+
+  /* Auth forms */
+  .auth-forms {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .auth-forms div {
+    min-width: 100%;
+  }
+
+  /* Tabelas responsivas */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table th, 
+  table td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Months */
+  .report-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .months {
+    justify-content: center;
+  }
+
+  .month-btn {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .report-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .year-select {
+    font-size: 0.9rem;
+    padding: 0.2rem;
+  }
+
+  .footer-content {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .footer-item {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 120px;
+  }
+
+  .footer-fixed {
+    padding: 10px 0;
+  }
+
+  .footer-label {
+    font-size: 0.7rem;
+  }
+
+  .footer-value {
+    font-size: 1rem;
+  }
+}
+
+/* Ajustes para telas muito pequenas */
+@media screen and (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    font-size: 16px; /* Evita zoom em inputs no iOS */
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Ajuste para inputs de radio */
+  input[type="radio"] + label {
+    margin-right: 0.5rem;
+  }
+}
+
+/* Melhorias de acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Dark mode support */
+/* @media (prefers-color-scheme: dark) {
+  body {
+    background: #1a1a1a;
+    color: #fff;
+  }
+
+  .card {
+    background: #2d2d2d;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="email"],
+  input[type="password"],
+  select {
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
+  }
+
+  table {
+    background: #2d2d2d;
+  }
+
+  table tr:hover {
+    background: #333;
+  }
+
+  .month-btn {
+    background: #333;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .theme-toggle {
+    background: #fff;
+    color: #2c3e50;
+  }
+} */
+
+/* Para tema forçado via classe */
+body.dark-theme {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+body.dark-theme .card {
+  background: #2d2d2d;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+body.dark-theme nav {
+  background: #1a1a1a;
+}
+
+body.dark-theme table {
+  background: #2d2d2d;
+  color: #fff;
+}
+
+body.dark-theme table thead {
+  background: #1a1a1a;
+}
+
+body.dark-theme table tbody tr:hover {
+  background: #333;
+}
+
+body.dark-theme input[type="text"],
+body.dark-theme input[type="number"],
+body.dark-theme input[type="date"],
+body.dark-theme input[type="email"],
+body.dark-theme input[type="password"],
+body.dark-theme select {
+  background: #333;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+body.dark-theme .month-btn {
+  background: #333;
+  border-color: #444;
+  color: #fff;
+}
+
+body.dark-theme .theme-toggle {
+  background: #fff;
+  color: #2c3e50;
+}
+
+/* Adicione estas regras CSS */
+.tipo-despesa {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.tipo-despesa-opcao {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.meses-repeticao {
+  display: none;
+  margin-top: 10px;
+}
+
+.meses-repeticao.visible {
+  display: block;
 }
 
 /* Estilos para múltiplas despesas */
-.expense-item {
-  display: grid;
-  grid-template-columns: auto 1fr 1fr 2fr auto;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  align-items: center;
-  padding: 1rem;
-  background-color: #f8fafc;
-  border-radius: 0.5rem;
+.multiple-expenses {
+  margin-top: 2rem;
 }
 
-.expense-item input {
-  padding: 0.5rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.25rem;
-  width: 100%;
-}
-
-.expense-item .checkbox-group {
+.expense-row {
   display: flex;
   gap: 1rem;
-  white-space: nowrap;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  position: relative;
 }
 
-.expense-item .remove-expense {
+.expense-row .input-group {
+  flex: 1;
+  min-width: 120px;
+}
+
+.expense-row label {
+  font-size: 0.9rem;
+}
+
+.expense-row input[type="number"],
+.expense-row input[type="date"],
+.expense-row input[type="text"] {
+  margin-bottom: 0;
+}
+
+.btn-remove-expense {
   background: none;
   border: none;
-  color: var(--danger-color);
-  font-size: 1.5rem;
+  color: #e74c3c;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  transition: opacity 0.3s;
+  font-size: 1.2rem;
+  padding: 0.5rem;
+  margin-bottom: 0;
+  width: auto;
 }
 
-.expense-item .remove-expense:hover {
-  opacity: 0.7;
+.btn-remove-expense:hover {
+  color: #c0392b;
 }
 
-.btn-add-expense {
-  width: 100%;
-  padding: 0.75rem;
+#btnNovaDespesa {
+  background: #3498db;
+  color: white;
+  margin: 1rem 0;
+}
+
+#btnSalvarTodas {
+  margin-top: 1rem;
+}
+
+.radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.radio-group label {
+  margin: 0;
+}
+
+/* Configurações */
+.config-form {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.config-form .card {
+  flex: 1;
+  min-width: 300px;
+}
+
+.config-info {
+  color: #666;
+  font-size: 0.9rem;
   margin-bottom: 1rem;
-  background-color: var(--background-color);
-  border: 2px dashed #cbd5e1;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
-.btn-add-expense:hover {
-  background-color: #e2e8f0;
-  border-color: #94a3b8;
+/* Ajuste para tema escuro */
+body.dark-theme .config-info {
+  color: #aaa;
 }
 
-#expenses-list {
+/* Responsividade para configurações */
+@media screen and (max-width: 768px) {
+  .config-form {
+    flex-direction: column;
+  }
+  
+  .config-form .card {
+    width: 100%;
+  }
+}
+
+/* Adicione ao final do arquivo */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.checkbox-group label {
+  margin: 0;
+  display: inline;
+}
+
+.input-percentage {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-percentage input {
+  padding-right: 30px;
+}
+
+.percentage-symbol {
+  position: absolute;
+  right: 10px;
+  color: #666;
+}
+
+body.dark-theme .percentage-symbol {
+  color: #aaa;
+}
+
+#configAdiantamento {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+body.dark-theme #configAdiantamento {
+  border-top-color: #444;
+}
+
+/* Adicione aos estilos existentes */
+.input-money {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.money-symbol {
+  position: absolute;
+  left: 10px;
+  color: #666;
+}
+
+.input-money input {
+  padding-left: 30px;
+}
+
+input[type="checkbox"]:disabled + label {
+  color: #999;
+  cursor: not-allowed;
+}
+
+body.dark-theme input[type="checkbox"]:disabled + label {
+  color: #666;
+}
+
+body.dark-theme .money-symbol {
+  color: #aaa;
+}
+
+/* Estilos para a previsão de pagamento */
+.previsao-pagamento {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+body.dark-theme .previsao-pagamento {
+  border-top-color: #444;
+}
+
+.previsao-pagamento h4 {
   margin-bottom: 1rem;
+  color: #2c3e50;
 }
 
-.previsao-salario {
-    background-color: #f8fafc;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    margin-top: 1rem;
+body.dark-theme .previsao-pagamento h4 {
+  color: #fff;
 }
 
-.previsao-container {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-color);
+.previsao-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.previsao-container .valor {
-    font-weight: bold;
-    color: var(--success-color);
+.previsao-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
 }
 
-.previsao-container .data {
-    color: var(--primary-color);
-    font-weight: 500;
+body.dark-theme .previsao-item {
+  background: #2a2a2a;
+}
+
+.previsao-label {
+  min-width: 120px;
+  color: #666;
+}
+
+body.dark-theme .previsao-label {
+  color: #aaa;
+}
+
+.previsao-valor {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+body.dark-theme .previsao-valor {
+  color: #fff;
+}
+
+.previsao-data {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+body.dark-theme .previsao-data {
+  color: #aaa;
+}
+
+.previsao-item.destaque {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+}
+
+body.dark-theme .previsao-item.destaque {
+  background: #1a237e;
+  border-left: 4px solid #3f51b5;
+}
+
+/* Adicione estes estilos ao final do arquivo */
+
+/* Estilos para os tooltips da tabela */
+table td[title] {
+  position: relative;
+  cursor: help;
+}
+
+table td[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 8px;
+  background: #333;
+  color: white;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  min-width: 200px;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+/* Versão dark mode */
+body.dark-theme table td[title]:hover::after {
+  background: #1a1a1a;
+  color: white;
+  border: 1px solid #444;
+}
+
+/* Adicione estes estilos para dias não úteis */
+table td.dia-nao-util {
+  font-style: italic;
+  color: #888;
+}
+
+/* Versão dark mode */
+body.dark-theme table td.dia-nao-util {
+  color: #666;
+}
+
+/* Ajuste os estilos para os saldos sem incluir a classe dia-nao-util */
+td.saldo-positivo {
+  background-color: rgba(39, 174, 96, 0.1);
+  color: #27ae60;
+}
+
+td.saldo-negativo {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+/* Estilos para os meses com saldo negativo/positivo */
+.month-btn.mes-negativo {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.month-btn.mes-positivo {
+  color: #27ae60;
+  border-color: #27ae60;
+}
+
+/* Versão dark mode */
+body.dark-theme .month-btn.mes-negativo {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+body.dark-theme .month-btn.mes-positivo {
+  color: #2ecc71;
+  border-color: #2ecc71;
+}
+
+/* Mantenha a cor do mês selecionado */
+.month-btn.selected {
+  background: #2980b9;
+  color: white !important;
+  border-color: #2980b9 !important;
 }
 
 /* Adicione estes estilos */
-#parcelas-container {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
-    transition: all 0.3s ease;
+.filtros {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.helper-text {
-    display: block;
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-top: 0.25rem;
+.filtro-grupo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.meses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+.filtro-grupo select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  background-color: white;
 }
 
-.mes-card {
-    background-color: var(--card-background);
+/* Dark theme */
+body.dark-theme .filtro-grupo select {
+  background-color: #333;
+  color: white;
+  border-color: #555;
+}
+
+/* Adicione estes estilos para a mensagem de manutenção */
+.maintenance-message {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  border: 1px solid #ffeeba;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Versão dark mode */
+body.dark-theme .maintenance-message {
+  background-color: #2c2c2c;
+  color: #ffd700;
+  border-color: #454545;
+}
+
+/* Estilo para inputs e botões desabilitados */
+input:disabled,
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ajuste para labels de inputs desabilitados */
+input:disabled + label,
+button:disabled + label {
+  opacity: 0.6;
+}
+
+/* Adicione estes estilos ao seu arquivo CSS */
+.footer-fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+  padding: 15px 0;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.footer-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.footer-label {
+  font-size: 0.8rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.footer-value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.footer-value.positive {
+  color: #27ae60;
+}
+
+.footer-value.negative {
+  color: #e74c3c;
+}
+
+/* Dark theme */
+body.dark-theme .footer-fixed {
+  background: #1a1a1a;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .footer-label {
+  color: #999;
+}
+
+body.dark-theme .footer-value {
+  color: #fff;
+}
+
+body.dark-theme .footer-value.positive {
+  color: #2ecc71;
+}
+
+body.dark-theme .footer-value.negative {
+  color: #e74c3c;
+}
+
+/* Adicione estes estilos */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.password-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-size: 1.2rem;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.auth-link a {
+  color: #2980b9;
+  text-decoration: none;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+/* Dark theme */
+body.dark-theme .error-message {
+  color: #e74c3c;
+}
+
+body.dark-theme .auth-link a {
+  color: #3498db;
+}
+
+body.dark-theme .toggle-password {
+  color: #fff;
+}
+
+/* Estilos para a página de autenticação */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --error-color: #ef4444;
+    --text-color: #1f2937;
+    --text-light: #6b7280;
+    --background: #ffffff;
+    --card-background: #ffffff;
+    --border-color: #e5e7eb;
+    --input-background: #f9fafb;
+}
+
+.dark-theme {
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
+    --text-color: #f3f4f6;
+    --text-light: #9ca3af;
+    --background: #111827;
+    --card-background: #1f2937;
+    --border-color: #374151;
+    --input-background: #374151;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--background);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.mes-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-}
-
-.mes-card.active {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-.mes-selector {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-#ano-select {
-    padding: 8px;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.5rem;
-    font-size: 1.1rem;
-    background-color: var(--card-background);
-}
-
-/* Estilos para autenticação */
-.login-container {
-    max-width: 400px;
-    margin: 100px auto;
-    padding: 2rem;
-    background-color: var(--card-background);
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Atualizar estilos para auth-form e auth-tabs */
-.auth-form {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.auth-form.active {
-    display: flex;
-    opacity: 1;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.auth-tabs {
-    display: flex;
-    margin-bottom: 2rem;
-    gap: 1rem;
+.auth-wrapper {
     width: 100%;
+    max-width: 420px;
 }
 
-.auth-tab {
-    flex: 1;
-    padding: 0.75rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-bottom: 2px solid #e2e8f0;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    color: #64748b;
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
-.auth-tab.active {
-    border-bottom-color: var(--primary-color);
-    color: var(--primary-color);
-    font-weight: 500;
-}
-
-.auth-form .input-group {
+.auth-logo {
+    width: 64px;
+    height: 64px;
     margin-bottom: 1rem;
 }
 
-.auth-form .btn-primary {
-    width: 100%;
-    padding: 0.75rem;
+.auth-header h1 {
+    font-size: 1.875rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.auth-subtitle {
+    color: var(--text-light);
+    margin-top: 0.5rem;
+}
+
+.auth-card {
+    background-color: var(--card-background);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.auth-card h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.auth-card-subtitle {
+    color: var(--text-light);
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.input-group label {
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.input-group input {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--input-background);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.password-input {
+    position: relative;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-light);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.25rem;
+}
+
+.btn-primary {
     background-color: var(--primary-color);
     color: white;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s;
 }
 
-.auth-form .btn-primary:hover {
-    background-color: #1d4ed8;
+.btn-primary:hover {
+    background-color: var(--primary-hover);
 }
 
-#btn-logout {
-    background-color: var(--danger-color);
-    color: white;
+.auth-link {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-light);
 }
 
-#btn-logout:hover {
-    background-color: #b91c1c;
+.auth-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
 }
 
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .auth-header h1 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Adicione estes estilos */
+.month-btn[data-status="positivo"] {
+  background-color: var(--positive-color);
+  color: white;
+}
+
+.month-btn[data-status="negativo"] {
+  background-color: var(--negative-color);
+  color: white;
+}
