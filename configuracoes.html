@@ -64,7 +64,7 @@
           </div>
 
           <div class="checkbox-group">
-            <input type="checkbox" id="temInvestimento" disabled />
+            <input type="checkbox" id="temInvestimento" />
             <label for="temInvestimento">Investir parte do salário</label>
           </div>
 
@@ -154,100 +154,31 @@
     </button>
 
     <script type="module">
+      import { auth } from './firebase-config.js';
       import { checkAuth, logout } from "./auth.js";
       import { salvarConfiguracoes, carregarConfiguracoes } from "./config.js";
       import { atualizarRodape } from "./finance.js";
+      import { formatarData } from "./date-utils.js";
 
-      // Verificação de autenticação
-      checkAuth();
+      // Funções globais
+      window.formatarMoeda = function(valor) {
+        return `R$ ${Number(valor).toFixed(2)}`;
+      };
 
-      // Setup dos event listeners
-      document.getElementById("btnLogout").onclick = logout;
-
-      // Configurar visibility do adiantamento
-      const checkboxAdiantamento = document.getElementById("temAdiantamento");
-      const configAdiantamento = document.getElementById("configAdiantamento");
-
-      checkboxAdiantamento.addEventListener('change', () => {
-        configAdiantamento.style.display = checkboxAdiantamento.checked ? 'block' : 'none';
-        if (!checkboxAdiantamento.checked) {
-          document.getElementById("porcentagemAdiantamento").value = '';
-          document.getElementById("diaAdiantamento").value = '';
-        }
-        atualizarPrevisao(); // Adiciona chamada para atualizar previsão
-      });
-
-      // Configurar checkbox de investimento
-      const salarioBaseInput = document.getElementById("salarioBase");
-      const checkboxInvestimento = document.getElementById("temInvestimento");
-      const configInvestimento = document.getElementById("configInvestimento");
-      const porcentagemInvestimentoInput = document.getElementById("porcentagemInvestimento");
-      const valorFixoInvestimentoInput = document.getElementById("valorFixoInvestimento");
-
-      // Habilitar checkbox de investimento apenas quando salário base estiver preenchido
-      salarioBaseInput.addEventListener('input', () => {
-        const salarioBase = parseFloat(salarioBaseInput.value) || 0;
-        checkboxInvestimento.disabled = salarioBase <= 0;
-        checkboxAdiantamento.disabled = salarioBase <= 0;
-        
-        if (salarioBase <= 0) {
-          checkboxInvestimento.checked = false;
-          checkboxAdiantamento.checked = false;
-          configInvestimento.style.display = 'none';
-          configAdiantamento.style.display = 'none';
-        }
-      });
-
-      // Toggle da visibilidade dos campos de investimento
-      checkboxInvestimento.addEventListener('change', () => {
-        configInvestimento.style.display = checkboxInvestimento.checked ? 'block' : 'none';
-        if (!checkboxInvestimento.checked) {
-          porcentagemInvestimentoInput.value = '';
-          valorFixoInvestimentoInput.value = '';
-        }
-        atualizarPrevisao(); // Adiciona chamada para atualizar previsão
-      });
-
-      // Calcular valor fixo quando porcentagem é alterada
-      porcentagemInvestimentoInput.addEventListener('input', () => {
-        if (porcentagemInvestimentoInput.value) {
-          const salarioBase = parseFloat(salarioBaseInput.value) || 0;
-          const porcentagem = parseFloat(porcentagemInvestimentoInput.value) || 0;
-          const valorFixo = (salarioBase * porcentagem / 100).toFixed(2);
-          valorFixoInvestimentoInput.value = valorFixo;
-        }
-      });
-
-      // Calcular porcentagem quando valor fixo é alterado
-      valorFixoInvestimentoInput.addEventListener('input', () => {
-        if (valorFixoInvestimentoInput.value) {
-          const salarioBase = parseFloat(salarioBaseInput.value) || 0;
-          const valorFixo = parseFloat(valorFixoInvestimentoInput.value) || 0;
-          const porcentagem = ((valorFixo / salarioBase) * 100).toFixed(2);
-          porcentagemInvestimentoInput.value = porcentagem;
-        }
-      });
-
-      // Função para formatar valores em reais
-      function formatarMoeda(valor) {
-        return `R$ ${valor.toFixed(2)}`;
-      }
-
-      // Atualiza a função atualizarPrevisao
-      function atualizarPrevisao() {
+      window.atualizarPrevisao = function() {
         const hoje = new Date();
         const mesAtual = hoje.getMonth() + 1;
         const anoAtual = hoje.getFullYear();
 
-        const salarioBase = parseFloat(salarioBaseInput.value) || 0;
-        const temAdiantamento = checkboxAdiantamento.checked;
+        const salarioBase = parseFloat(document.getElementById("salarioBase").value) || 0;
+        const temAdiantamento = document.getElementById("temAdiantamento").checked;
         const porcentagemAdiantamento = parseFloat(document.getElementById("porcentagemAdiantamento").value) || 0;
         const diaAdiantamento = parseInt(document.getElementById("diaAdiantamento").value) || 0;
         const diaPagamento = parseInt(document.getElementById("diaPagamentoFinal").value) || 0;
 
-        const temInvestimento = checkboxInvestimento.checked;
-        const porcentagemInvestimento = parseFloat(porcentagemInvestimentoInput.value) || 0;
-        const valorFixoInvestimento = parseFloat(valorFixoInvestimentoInput.value) || 0;
+        const temInvestimento = document.getElementById("temInvestimento").checked;
+        const porcentagemInvestimento = parseFloat(document.getElementById("porcentagemInvestimento").value) || 0;
+        const valorFixoInvestimento = parseFloat(document.getElementById("valorFixoInvestimento").value) || 0;
 
         // Atualiza salário bruto
         document.getElementById("previsaoSalarioBruto").textContent = formatarMoeda(salarioBase);
@@ -311,77 +242,141 @@
         document.getElementById("previsaoSalarioFinal").textContent = formatarMoeda(salarioFinal);
         document.getElementById("previsaoDataPagamento").textContent = 
           diaPagamento ? ` (${formatarData(diaPagamento, mesAtual, anoAtual)})` : '';
+      };
+
+      // Event listeners for checkboxes
+      document.getElementById("temAdiantamento")?.addEventListener('change', function() {
+        const configAdiantamento = document.getElementById("configAdiantamento");
+        configAdiantamento.style.display = this.checked ? 'block' : 'none';
+        
+        if (!this.checked) {
+          document.getElementById("porcentagemAdiantamento").value = '';
+          document.getElementById("diaAdiantamento").value = '';
+        }
+        window.atualizarPrevisao();
+      });
+
+      document.getElementById("temInvestimento")?.addEventListener('change', function() {
+        const configInvestimento = document.getElementById("configInvestimento");
+        configInvestimento.style.display = this.checked ? 'block' : 'none';
+        
+        if (!this.checked) {
+          document.getElementById("porcentagemInvestimento").value = '';
+          document.getElementById("valorFixoInvestimento").value = '';
+        }
+        window.atualizarPrevisao();
+      });
+
+      // Event listener for salary base
+      document.getElementById("salarioBase")?.addEventListener('input', function() {
+        const salarioBase = parseFloat(this.value) || 0;
+        const checkboxInvestimento = document.getElementById("temInvestimento");
+        const checkboxAdiantamento = document.getElementById("temAdiantamento");
+        
+        checkboxInvestimento.disabled = salarioBase <= 0;
+        checkboxAdiantamento.disabled = salarioBase <= 0;
+        
+        if (salarioBase <= 0) {
+          checkboxInvestimento.checked = false;
+          checkboxAdiantamento.checked = false;
+          document.getElementById("configInvestimento").style.display = 'none';
+          document.getElementById("configAdiantamento").style.display = 'none';
+        }
+        
+        window.atualizarPrevisao();
+      });
+
+      // Event listeners for all input fields
+      ['porcentagemAdiantamento', 'diaAdiantamento', 'diaPagamentoFinal', 
+       'porcentagemInvestimento', 'valorFixoInvestimento'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', window.atualizarPrevisao);
+      });
+
+      async function initApp() {
+        try {
+          const user = await checkAuth();
+          if (!user) {
+            window.location.href = 'index.html';
+            return;
+          }
+
+          console.log("Usuário autenticado, iniciando setup..."); // Debug
+          
+          // Configura os eventos primeiro
+          setupEventListeners();
+
+          // Depois carrega as configurações
+          const config = await carregarConfiguracoes();
+          if (config) {
+            preencherFormulario(config);
+          }
+
+          // Por último carrega o rodapé
+          await loadFooter();
+          
+          console.log("Inicialização concluída"); // Debug
+
+        } catch (error) {
+          console.error("Erro na inicialização:", error);
+        }
       }
 
-      // Adicione os event listeners para atualizar a previsão
-      const camposParaMonitorar = [
-        salarioBaseInput,
-        checkboxAdiantamento,
-        document.getElementById("porcentagemAdiantamento"),
-        document.getElementById("diaAdiantamento"),
-        document.getElementById("diaPagamentoFinal"),
-        checkboxInvestimento,
-        porcentagemInvestimentoInput,
-        valorFixoInvestimentoInput
-      ];
-
-      camposParaMonitorar.forEach(campo => {
-        campo.addEventListener('input', atualizarPrevisao);
-        campo.addEventListener('change', atualizarPrevisao);
-      });
-
-      // Adicione este trecho para garantir que todos os campos estão sendo monitorados
-      const todosOsCampos = [
-        salarioBaseInput,
-        checkboxAdiantamento,
-        document.getElementById("porcentagemAdiantamento"),
-        document.getElementById("diaAdiantamento"),
-        document.getElementById("diaPagamentoFinal"),
-        checkboxInvestimento,
-        porcentagemInvestimentoInput,
-        valorFixoInvestimentoInput
-      ];
-
-      todosOsCampos.forEach(campo => {
-        if (campo) {
-          ['input', 'change'].forEach(evento => {
-            campo.addEventListener(evento, atualizarPrevisao);
-          });
-        }
-      });
-
-      // Atualizar previsão também quando carregar as configurações
-      const carregamentoOriginal = window.addEventListener('load', async () => {
-        const config = await carregarConfiguracoes();
-        if (config) {
-          document.getElementById("salarioBase").value = config.salarioBase || '';
-          document.getElementById("temAdiantamento").checked = config.temAdiantamento || false;
-          document.getElementById("porcentagemAdiantamento").value = config.porcentagemAdiantamento || '';
-          document.getElementById("diaAdiantamento").value = config.diaAdiantamento || '';
-          document.getElementById("diaPagamentoFinal").value = config.diaPagamentoFinal || '';
-          
-          // Mostra/esconde configuração de adiantamento baseado no checkbox
-          configAdiantamento.style.display = config.temAdiantamento ? 'block' : 'none';
-
-          document.getElementById("temInvestimento").checked = config.temInvestimento || false;
-          document.getElementById("porcentagemInvestimento").value = config.porcentagemInvestimento || '';
-          document.getElementById("valorFixoInvestimento").value = config.valorFixoInvestimento || '';
-          
-          // Atualizar visibilidade do investimento
-          configInvestimento.style.display = config.temInvestimento ? 'block' : 'none';
-          
-          // Verificar salário base para habilitar checkboxes
-          const salarioBase = parseFloat(config.salarioBase) || 0;
-          checkboxInvestimento.disabled = salarioBase <= 0;
-          checkboxAdiantamento.disabled = salarioBase <= 0;
-
-          atualizarPrevisao(); // Adicione esta linha
-        }
-      });
-
-      // Modifique o evento do btnSalvarSalario
-      document.getElementById("btnSalvarSalario").onclick = async () => {
+      // Função para carregar o rodapé
+      async function loadFooter() {
         try {
+          const response = await fetch('footer.html');
+          const html = await response.text();
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = html;
+          document.body.appendChild(tempDiv.firstElementChild);
+          await atualizarRodape();
+        } catch (error) {
+          console.error("Erro ao carregar rodapé:", error);
+        }
+      }
+
+      async function loadConfig() {
+        try {
+          const config = await carregarConfiguracoes();
+          if (config) {
+            preencherFormulario(config);
+          }
+        } catch (error) {
+          console.error("Erro ao carregar configurações:", error);
+          alert("Erro ao carregar configurações");
+        }
+      }
+
+      // Inicia a aplicação quando o DOM estiver pronto
+      document.addEventListener('DOMContentLoaded', initApp);
+
+      // Função para preencher o formulário com configurações existentes
+      function preencherFormulario(config) {
+        document.getElementById("salarioBase").value = config.salarioBase || '';
+        document.getElementById("temAdiantamento").checked = config.temAdiantamento || false;
+        document.getElementById("porcentagemAdiantamento").value = config.porcentagemAdiantamento || '';
+        document.getElementById("diaAdiantamento").value = config.diaAdiantamento || '';
+        document.getElementById("diaPagamentoFinal").value = config.diaPagamentoFinal || '';
+        
+        // Mostra/esconde configuração de adiantamento
+        document.getElementById("configAdiantamento").style.display = 
+          config.temAdiantamento ? 'block' : 'none';
+
+        document.getElementById("temInvestimento").checked = config.temInvestimento || false;
+        document.getElementById("porcentagemInvestimento").value = config.porcentagemInvestimento || '';
+        document.getElementById("valorFixoInvestimento").value = config.valorFixoInvestimento || '';
+        
+        // Atualiza visibilidade do investimento
+        document.getElementById("configInvestimento").style.display = 
+          config.temInvestimento ? 'block' : 'none';
+
+        atualizarPrevisao();
+      }
+
+      // Adicione esta função para salvar as configurações
+      async function salvarConfiguracoesUsuario() {
+        try {
+          console.log("Iniciando salvamento..."); // Debug
           const config = {
             salarioBase: parseFloat(document.getElementById("salarioBase").value) || 0,
             temAdiantamento: document.getElementById("temAdiantamento").checked,
@@ -392,6 +387,8 @@
             porcentagemInvestimento: parseFloat(document.getElementById("porcentagemInvestimento").value) || 0,
             valorFixoInvestimento: parseFloat(document.getElementById("valorFixoInvestimento").value) || 0
           };
+
+          console.log("Configurações a salvar:", config); // Debug
 
           // Validações básicas
           if (!config.salarioBase) {
@@ -411,48 +408,260 @@
           const anosFuturos = 2100 - anoAtual;
           const mesesTotais = anosFuturos * 12;
 
-          // Confirma com o usuário antes de criar as transações
           if (confirm(`Deseja criar as transações salariais para todos os meses até 2100? (Aproximadamente ${mesesTotais} meses)\n\nIsso irá atualizar todas as transações futuras a partir do mês atual.`)) {
             await salvarConfiguracoes(config);
-            await atualizarRodape(); // Adiciona esta linha
+            alert(`Configurações salvas com sucesso!\n\n✓ Salário base: R$ ${config.salarioBase}\n✓ Dia do pagamento: ${config.diaPagamentoFinal}\n${config.temAdiantamento ? `✓ Adiantamento: ${config.porcentagemAdiantamento}% no dia ${config.diaAdiantamento}\n` : ''}${config.temInvestimento ? `✓ Investimento: ${config.porcentagemInvestimento}%\n` : ''}\n✓ Transações geradas até 2100`);
+            await atualizarRodape();
           }
         } catch (error) {
-          alert(error.message);
+          console.error("Erro ao salvar:", error); // Debug
+          alert("Erro ao salvar configurações: " + error.message);
         }
-      };
+      }
 
-      // Salvar configurações do período
-      document.getElementById("btnSalvarPeriodo").onclick = async () => {
-        const diaInicio = parseInt(document.getElementById("diaInicio").value) || 20;
-        const diaFim = parseInt(document.getElementById("diaFim").value) || 19;
+      // Setup dos event listeners
+      function setupEventListeners() {
+        document.getElementById("btnLogout").onclick = logout;
 
-        await salvarConfiguracoes({
-          diaInicio,
-          diaFim
+        // Configurar visibility do adiantamento
+        const checkboxAdiantamento = document.getElementById("temAdiantamento");
+        const configAdiantamento = document.getElementById("configAdiantamento");
+
+        checkboxAdiantamento.addEventListener('change', () => {
+          configAdiantamento.style.display = checkboxAdiantamento.checked ? 'block' : 'none';
+          if (!checkboxAdiantamento.checked) {
+            document.getElementById("porcentagemAdiantamento").value = '';
+            document.getElementById("diaAdiantamento").value = '';
+          }
+          atualizarPrevisao(); // Adiciona chamada para atualizar previsão
         });
-      };
 
-      // Atualiza o rodapé quando a página carregar
-      document.addEventListener('DOMContentLoaded', async () => {
-        await checkAuth();
-        await atualizarRodape();
-      });
-    </script>
+        // Configurar checkbox de investimento
+        const salarioBaseInput = document.getElementById("salarioBase");
+        const checkboxInvestimento = document.getElementById("temInvestimento");
+        const configInvestimento = document.getElementById("configInvestimento");
+        const porcentagemInvestimentoInput = document.getElementById("porcentagemInvestimento");
+        const valorFixoInvestimentoInput = document.getElementById("valorFixoInvestimento");
 
-    <script type="module">
-      // Carrega o rodapé dinamicamente
-      fetch('footer.html')
-        .then(response => response.text())
-        .then(html => {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = html;
-          document.body.appendChild(tempDiv.firstElementChild);
-        })
-        .then(() => {
-          import('./finance.js').then(module => {
-            module.atualizarRodape();
+        // Habilitar checkbox de investimento apenas quando salário base estiver preenchido
+        salarioBaseInput.addEventListener('input', () => {
+          const salarioBase = parseFloat(salarioBaseInput.value) || 0;
+          checkboxInvestimento.disabled = salarioBase <= 0;
+          checkboxAdiantamento.disabled = salarioBase <= 0;
+          
+          if (salarioBase <= 0) {
+            checkboxInvestimento.checked = false;
+            checkboxAdiantamento.checked = false;
+            configInvestimento.style.display = 'none';
+            configAdiantamento.style.display = 'none';
+          }
+        });
+
+        // Toggle da visibilidade dos campos de investimento
+        checkboxInvestimento.addEventListener('change', () => {
+          configInvestimento.style.display = checkboxInvestimento.checked ? 'block' : 'none';
+          if (!checkboxInvestimento.checked) {
+            porcentagemInvestimentoInput.value = '';
+            valorFixoInvestimentoInput.value = '';
+          }
+          atualizarPrevisao(); // Adiciona chamada para atualizar previsão
+        });
+
+        // Calcular valor fixo quando porcentagem é alterada
+        porcentagemInvestimentoInput.addEventListener('input', () => {
+          if (porcentagemInvestimentoInput.value) {
+            const salarioBase = parseFloat(salarioBaseInput.value) || 0;
+            const porcentagem = parseFloat(porcentagemInvestimentoInput.value) || 0;
+            const valorFixo = (salarioBase * porcentagem / 100).toFixed(2);
+            valorFixoInvestimentoInput.value = valorFixo;
+          }
+        });
+
+        // Calcular porcentagem quando valor fixo é alterado
+        valorFixoInvestimentoInput.addEventListener('input', () => {
+          if (valorFixoInvestimentoInput.value) {
+            const salarioBase = parseFloat(salarioBaseInput.value) || 0;
+            const valorFixo = parseFloat(valorFixoInvestimentoInput.value) || 0;
+            const porcentagem = ((valorFixo / salarioBase) * 100).toFixed(2);
+            porcentagemInvestimentoInput.value = porcentagem;
+          }
+        });
+
+        // Função para formatar valores em reais
+        function formatarMoeda(valor) {
+          return `R$ ${valor.toFixed(2)}`;
+        }
+
+        // Atualiza a função atualizarPrevisao
+        function atualizarPrevisao() {
+          const hoje = new Date();
+          const mesAtual = hoje.getMonth() + 1;
+          const anoAtual = hoje.getFullYear();
+
+          const salarioBase = parseFloat(salarioBaseInput.value) || 0;
+          const temAdiantamento = checkboxAdiantamento.checked;
+          const porcentagemAdiantamento = parseFloat(document.getElementById("porcentagemAdiantamento").value) || 0;
+          const diaAdiantamento = parseInt(document.getElementById("diaAdiantamento").value) || 0;
+          const diaPagamento = parseInt(document.getElementById("diaPagamentoFinal").value) || 0;
+
+          const temInvestimento = checkboxInvestimento.checked;
+          const porcentagemInvestimento = parseFloat(porcentagemInvestimentoInput.value) || 0;
+          const valorFixoInvestimento = parseFloat(valorFixoInvestimentoInput.value) || 0;
+
+          // Atualiza salário bruto
+          document.getElementById("previsaoSalarioBruto").textContent = formatarMoeda(salarioBase);
+
+          // Calcula valores de investimento
+          let valorInvestimentoTotal = 0;
+          if (temInvestimento && salarioBase > 0) {
+            valorInvestimentoTotal = valorFixoInvestimento || (salarioBase * porcentagemInvestimento / 100);
+          }
+
+          // Atualiza adiantamento
+          const previsaoAdiantamentoContainer = document.getElementById("previsaoAdiantamentoContainer");
+          if (temAdiantamento && salarioBase > 0 && porcentagemAdiantamento > 0) {
+            const valorAdiantamento = (salarioBase * porcentagemAdiantamento) / 100;
+            const valorInvestimentoAdiantamento = temInvestimento ? 
+              (valorInvestimentoTotal * valorAdiantamento / salarioBase) : 0;
+
+            document.getElementById("previsaoAdiantamento").textContent = 
+              formatarMoeda(valorAdiantamento - valorInvestimentoAdiantamento);
+            document.getElementById("previsaoDataAdiantamento").textContent = 
+              diaAdiantamento ? ` (${formatarData(diaAdiantamento, mesAtual, anoAtual)})` : '';
+            previsaoAdiantamentoContainer.style.display = "flex";
+          } else {
+            previsaoAdiantamentoContainer.style.display = "none";
+          }
+
+          // Atualiza investimento
+          const previsaoInvestimentoContainer = document.getElementById("previsaoInvestimentoContainer");
+          if (temInvestimento && salarioBase > 0) {
+            document.getElementById("previsaoInvestimento").textContent = formatarMoeda(valorInvestimentoTotal);
+            previsaoInvestimentoContainer.style.display = "flex";
+          } else {
+            previsaoInvestimentoContainer.style.display = "none";
+          }
+
+          // Calcula salário final (correção do cálculo)
+          let salarioFinal = salarioBase;
+          let valorAdiantamento = 0;
+          let valorInvestimentoAdiantamento = 0;
+          
+          if (temAdiantamento && salarioBase > 0) {
+            valorAdiantamento = (salarioBase * porcentagemAdiantamento) / 100;
+            
+            // Se tem investimento, calcula a parte proporcional do adiantamento
+            if (temInvestimento) {
+              valorInvestimentoAdiantamento = (valorInvestimentoTotal * valorAdiantamento) / salarioBase;
+              // O adiantamento já tem o desconto do investimento proporcional
+              salarioFinal -= (valorAdiantamento - valorInvestimentoAdiantamento);
+            } else {
+              // Se não tem investimento, desconta só o adiantamento
+              salarioFinal -= valorAdiantamento;
+            }
+          }
+
+          // Se tem investimento, desconta apenas a parte do investimento que não foi descontada no adiantamento
+          if (temInvestimento && salarioBase > 0) {
+            const valorInvestimentoRestante = valorInvestimentoTotal - valorInvestimentoAdiantamento;
+            salarioFinal -= valorInvestimentoRestante;
+          }
+          
+          document.getElementById("previsaoSalarioFinal").textContent = formatarMoeda(salarioFinal);
+          document.getElementById("previsaoDataPagamento").textContent = 
+            diaPagamento ? ` (${formatarData(diaPagamento, mesAtual, anoAtual)})` : '';
+        }
+
+        // Adicione os event listeners para atualizar a previsão
+        const camposParaMonitorar = [
+          salarioBaseInput,
+          checkboxAdiantamento,
+          document.getElementById("porcentagemAdiantamento"),
+          document.getElementById("diaAdiantamento"),
+          document.getElementById("diaPagamentoFinal"),
+          checkboxInvestimento,
+          porcentagemInvestimentoInput,
+          valorFixoInvestimentoInput
+        ];
+
+        camposParaMonitorar.forEach(campo => {
+          campo.addEventListener('input', atualizarPrevisao);
+          campo.addEventListener('change', atualizarPrevisao);
+        });
+
+        // Adicione este trecho para garantir que todos os campos estão sendo monitorados
+        const todosOsCampos = [
+          salarioBaseInput,
+          checkboxAdiantamento,
+          document.getElementById("porcentagemAdiantamento"),
+          document.getElementById("diaAdiantamento"),
+          document.getElementById("diaPagamentoFinal"),
+          checkboxInvestimento,
+          porcentagemInvestimentoInput,
+          valorFixoInvestimentoInput
+        ];
+
+        todosOsCampos.forEach(campo => {
+          if (campo) {
+            ['input', 'change'].forEach(evento => {
+              campo.addEventListener(evento, atualizarPrevisao);
+            });
+          }
+        });
+
+        // Atualizar previsão também quando carregar as configurações
+        const carregamentoOriginal = window.addEventListener('load', async () => {
+          const config = await carregarConfiguracoes();
+          if (config) {
+            document.getElementById("salarioBase").value = config.salarioBase || '';
+            document.getElementById("temAdiantamento").checked = config.temAdiantamento || false;
+            document.getElementById("porcentagemAdiantamento").value = config.porcentagemAdiantamento || '';
+            document.getElementById("diaAdiantamento").value = config.diaAdiantamento || '';
+            document.getElementById("diaPagamentoFinal").value = config.diaPagamentoFinal || '';
+            
+            // Mostra/esconde configuração de adiantamento baseado no checkbox
+            configAdiantamento.style.display = config.temAdiantamento ? 'block' : 'none';
+
+            document.getElementById("temInvestimento").checked = config.temInvestimento || false;
+            document.getElementById("porcentagemInvestimento").value = config.porcentagemInvestimento || '';
+            document.getElementById("valorFixoInvestimento").value = config.valorFixoInvestimento || '';
+            
+            // Atualizar visibilidade do investimento
+            configInvestimento.style.display = config.temInvestimento ? 'block' : 'none';
+            
+            // Verificar salário base para habilitar checkboxes
+            const salarioBase = parseFloat(config.salarioBase) || 0;
+            checkboxInvestimento.disabled = salarioBase <= 0;
+            checkboxAdiantamento.disabled = salarioBase <= 0;
+
+            atualizarPrevisao(); // Adicione esta linha
+          }
+        });
+
+        // Modifique o evento do btnSalvarSalario
+        const btnSalvarSalario = document.getElementById("btnSalvarSalario");
+        if (btnSalvarSalario) {
+          btnSalvarSalario.onclick = salvarConfiguracoesUsuario;
+          console.log("Evento de salvar configurado"); // Debug
+        }
+
+        // Salvar configurações do período
+        document.getElementById("btnSalvarPeriodo").onclick = async () => {
+          const diaInicio = parseInt(document.getElementById("diaInicio").value) || 20;
+          const diaFim = parseInt(document.getElementById("diaFim").value) || 19;
+
+          await salvarConfiguracoes({
+            diaInicio,
+            diaFim
           });
+        };
+
+        // Atualiza o rodapé quando a página carregar
+        document.addEventListener('DOMContentLoaded', async () => {
+          await checkAuth();
+          await atualizarRodape();
         });
+      }
     </script>
 
     <script src="theme.js"></script>

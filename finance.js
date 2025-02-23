@@ -428,7 +428,7 @@ async function atualizarTabelaMesclada(ano, mes, transacoes) {
   // Limpa a tabela
   tableBody.innerHTML = '';
 
-  // Declaração das variáveis de controle
+  // Zera os totais ao iniciar
   let totalEntrada = 0;
   let totalSaida = 0;
   let totalDespesaDiaria = 0;
@@ -481,6 +481,11 @@ async function atualizarTabelaMesclada(ano, mes, transacoes) {
         `;
         tableBody.appendChild(tr);
       }
+      
+      // Zera os totais quando não há transações
+      document.getElementById("totalEntrada").textContent = formatMoney(0);
+      document.getElementById("totalSaida").textContent = formatMoney(0);
+      document.getElementById("totalDespesaDiaria").textContent = formatMoney(0);
       return;
     }
 
@@ -689,27 +694,59 @@ export async function criarTransacoesSalariais(config) {
   const user = auth.currentUser;
   if (!user) return;
 
-  const {
-    salarioBase,
-    temAdiantamento,
-    porcentagemAdiantamento,
-    diaAdiantamento,
-    diaPagamentoFinal,
-    temInvestimento,
-    porcentagemInvestimento,
-    valorFixoInvestimento
-  } = config;
-
   try {
+    // Pega a data atual
     const dataAtual = new Date();
-    // Ajusta para o primeiro dia do mês atual
-    dataAtual.setDate(1);
-    dataAtual.setHours(0, 0, 0, 0);
+    const mesAtual = dataAtual.getMonth();
+    const anoAtual = dataAtual.getFullYear();
+    
+    console.log("Deletando transações futuras a partir de:", new Date(anoAtual, mesAtual, 1));
 
-    // Primeiro, deleta todas as transações automáticas futuras
-    await deletarTransacoesAutomaticasFuturas(user.uid, dataAtual);
+    // Deleta transações automáticas futuras
+    const qDelete = query(
+      collection(db, "transacoes"),
+      where("userId", "==", user.uid),
+      where("data", ">=", Timestamp.fromDate(new Date(anoAtual, mesAtual, 1))),
+      where("isAutomatic", "==", true)
+    );
 
+    const transacoesParaDeletar = await getDocs(qDelete);
+    const batch = writeBatch(db);
+    let countDeleted = 0;
+
+    transacoesParaDeletar.forEach((doc) => {
+      const transacao = doc.data();
+      // Deleta se for salário, adiantamento ou investimento
+      if (transacao.descricao.includes('Salário') || 
+          transacao.descricao.includes('Investimento') ||
+          transacao.descricao.includes('Adiantamento')) {
+        batch.delete(doc.ref);
+        countDeleted++;
+      }
+    });
+
+    if (countDeleted > 0) {
+      await batch.commit();
+      console.log(`${countDeleted} transações antigas deletadas`);
+    }
+
+    // Resto da função permanece igual, criando novas transações...
     const promises = [];
+    const dataInicio = new Date(anoAtual, mesAtual, 1);
+    const dataFim = new Date(2100, 11, 31);
+    const mesesTotais = (dataFim.getFullYear() - dataInicio.getFullYear()) * 12 + 
+                       dataFim.getMonth() - dataInicio.getMonth() + 1;
+
+    const {
+      salarioBase,
+      temAdiantamento,
+      porcentagemAdiantamento,
+      diaAdiantamento,
+      diaPagamentoFinal,
+      temInvestimento,
+      porcentagemInvestimento,
+      valorFixoInvestimento
+    } = config;
 
     // Função auxiliar para ajustar data para dia útil (mantém a mesma)
     function ajustarParaDiaUtil(diaOriginal, mes, ano) {
@@ -731,16 +768,10 @@ export async function criarTransacoesSalariais(config) {
       };
     }
 
-    // Calcula o número de meses até 2100
-    const anoFinal = 2100;
-    const mesFinal = 12;
-    const mesesTotais = ((anoFinal - dataAtual.getFullYear()) * 12) + 
-                       (mesFinal - dataAtual.getMonth());
-
     // Gera transações até 2100
     for (let i = 0; i < mesesTotais; i++) {
-      const ano = dataAtual.getFullYear() + Math.floor((dataAtual.getMonth() + i) / 12);
-      const mes = (dataAtual.getMonth() + i) % 12 + 1;
+      const ano = dataInicio.getFullYear() + Math.floor((dataInicio.getMonth() + i) / 12);
+      const mes = (dataInicio.getMonth() + i) % 12 + 1;
 
       // Ajusta as datas para dias úteis
       let dataAdiantamento = null;
@@ -959,9 +990,22 @@ export async function verificarStatusMeses(ano) {
   await Promise.all(monthPromises);
 }
 
-// Modifique a função atualizarRodape para trabalhar com mês atual por padrão
+// Modifique a função atualizarRodape para verificar autenticação
 export async function atualizarRodape(transacoes = null) {
   try {
+    // Aguarda autenticação
+    const user = await new Promise((resolve) => {
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        unsubscribe();
+        resolve(user);
+      });
+    });
+
+    if (!user) {
+      console.log("Usuário não autenticado");
+      return;
+    }
+
     const footerElements = {
       entradas: document.getElementById("footerTotalEntradas"),
       saidas: document.getElementById("footerTotalSaida"),

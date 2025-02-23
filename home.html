@@ -291,23 +291,35 @@
     <script src="theme.js"></script>
 
     <script type="module">
-      import { atualizarRodape } from "./finance.js";
-      
-      // Carrega o rodapé dinamicamente
-      fetch('footer.html')
-        .then(response => response.text())
-        .then(html => {
-          const tempDiv = document.createElement('div');
-          tempDiv.innerHTML = html;
-          document.body.appendChild(tempDiv.firstElementChild);
-        })
-        .then(async () => {
-          try {
+      import { auth } from './firebase-config.js';
+      import { atualizarRodape } from './finance.js';
+
+      // Modificar a forma como o rodapé é carregado
+      document.addEventListener('DOMContentLoaded', async () => {
+        try {
+          // Aguarda autenticação antes de carregar o rodapé
+          const user = await new Promise((resolve) => {
+            const unsubscribe = auth.onAuthStateChanged(user => {
+              unsubscribe();
+              resolve(user);
+            });
+          });
+
+          if (user) {
+            // Carrega o footer.html
+            const response = await fetch('footer.html');
+            const html = await response.text();
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            document.body.appendChild(tempDiv.firstElementChild);
+
+            // Atualiza o rodapé após footer estar no DOM
             await atualizarRodape();
-          } catch (error) {
-            console.error("Erro ao atualizar rodapé:", error);
           }
-        });
+        } catch (error) {
+          console.error("Erro ao carregar rodapé:", error);
+        }
+      });
     </script>
   </body>
 </html>
