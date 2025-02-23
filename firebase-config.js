@@ -20,3 +20,40 @@ const app = initializeApp(firebaseConfig);
 // Exporte instâncias para usar no restante do app
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Atualize estas regras de segurança no Console do Firebase:
+/*
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Funções auxiliares
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isUserDoc(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Regras para coleção users
+    match /users/{userId} {
+      allow read, write: if isUserDoc(userId);
+    }
+    
+    // Regras para coleção configuracoes
+    match /configuracoes/{docId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+    
+    // Regras para coleção transacoes
+    match /transacoes/{docId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
+*/
