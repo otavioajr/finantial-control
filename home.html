@@ -59,9 +59,10 @@
             </div>
           </div>
 
-          <div id="mesesRepeticao" class="meses-repeticao">
-            <label for="qtdMeses">Quantidade de meses</label>
-            <input type="number" id="qtdMeses" min="1" max="12" value="1" placeholder="Quantidade de meses">
+          <div id="mesesRepeticao" class="meses-repeticao" style="display: none;">
+            <label for="qtdMeses">Quantidade de parcelas</label>
+            <input type="number" id="qtdMeses" min="1" max="12" value="1" placeholder="Quantidade de parcelas">
+            <small>Número de meses em que esta despesa se repetirá</small>
           </div>
 
           <button id="btnAdicionarDespesa" class="btn-red">Adicionar Despesa</button>
@@ -102,9 +103,46 @@
           document.getElementById("despesaData").value = hoje;
           
           setupEventListeners();
+          
+          // Configura os campos de tipo de despesa - chama apenas uma vez
+          setupTipoDespesa();
         } catch (error) {
           console.error("Erro na inicialização:", error);
         }
+      }
+
+      // Função global de configuração dos tipos de despesa
+      function setupTipoDespesa() {
+        console.log("Configurando tipo despesa");
+        const mesesRepeticao = document.getElementById('mesesRepeticao');
+        const radioFixa = document.getElementById('despesaFixa');
+        const radioDiaria = document.getElementById('despesaDiaria');
+        
+        if (!mesesRepeticao || !radioFixa || !radioDiaria) {
+          console.error("Elementos não encontrados");
+          return;
+        }
+        
+        // Remove listeners anteriores para evitar duplicação
+        const novoRadioFixa = radioFixa.cloneNode(true);
+        const novoRadioDiaria = radioDiaria.cloneNode(true);
+        
+        radioFixa.parentNode.replaceChild(novoRadioFixa, radioFixa);
+        radioDiaria.parentNode.replaceChild(novoRadioDiaria, radioDiaria);
+        
+        // Adiciona os novos listeners
+        novoRadioFixa.addEventListener('change', () => {
+          console.log("Radio fixa alterado:", novoRadioFixa.checked);
+          mesesRepeticao.style.display = novoRadioFixa.checked ? 'block' : 'none';
+        });
+        
+        novoRadioDiaria.addEventListener('change', () => {
+          console.log("Radio diária alterado:", novoRadioDiaria.checked);
+          mesesRepeticao.style.display = 'none';
+        });
+        
+        // Verifica o estado inicial
+        mesesRepeticao.style.display = novoRadioFixa.checked ? 'block' : 'none';
       }
 
       document.addEventListener('DOMContentLoaded', init);
@@ -162,30 +200,7 @@
           }
         };
 
-        // Modifique a função setupTipoDespesa no script
-        function setupTipoDespesa() {
-          const mesesRepeticao = document.getElementById('mesesRepeticao');
-          const radioDespesaFixa = document.getElementById('despesaFixa');
-          
-          function toggleMesesRepeticao() {
-            mesesRepeticao.style.display = radioDespesaFixa.checked ? 'block' : 'none';
-          }
-
-          // Adiciona o listener para ambos os radios
-          document.querySelectorAll('input[name="tipoDespesa"]').forEach(radio => {
-            radio.addEventListener('change', toggleMesesRepeticao);
-          });
-
-          // Verifica o estado inicial
-          toggleMesesRepeticao();
-        }
-
-        // Certifique-se de que o setupTipoDespesa é chamado após o DOM estar pronto
-        document.addEventListener('DOMContentLoaded', () => {
-          setupTipoDespesa();
-        });
-
-        // Função para criar uma nova linha de despesa
+        // Função para criar uma nova linha de despesa múltipla
         function createExpenseRow() {
           const row = document.createElement('div');
           row.className = 'expense-row';
@@ -247,13 +262,13 @@
         }
 
         // Configurar o botão de adicionar nova despesa
-        document.getElementById('btnNovaDespesa').addEventListener('click', () => {
+        document.getElementById('btnNovaDespesa')?.addEventListener('click', () => {
           const container = document.getElementById('multipleExpensesContainer');
           container.appendChild(createExpenseRow());
         });
 
         // Configurar o botão de salvar todas
-        document.getElementById('btnSalvarTodas').addEventListener('click', async () => {
+        document.getElementById('btnSalvarTodas')?.addEventListener('click', async () => {
           const rows = document.querySelectorAll('.expense-row');
           const promises = [];
 
